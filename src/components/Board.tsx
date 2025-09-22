@@ -35,15 +35,16 @@ export default function Board({ className }: BoardProps) {
   }
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('w-full animate-fade-in', className)}>
       {/* Заголовки категорий */}
       <div className="grid grid-cols-5 gap-3 mb-3">
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <div
             key={category.id}
-            className="jeopardy-board p-3 text-center min-h-[60px] flex items-center justify-center"
+            className="jeopardy-board p-3 text-center min-h-[60px] flex items-center justify-center animate-slide-up glow-effect"
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <h3 className="text-sm font-bold leading-tight">
+            <h3 className="text-sm font-bold leading-tight text-shadow">
               {category.name}
             </h3>
           </div>
@@ -67,17 +68,23 @@ export default function Board({ className }: BoardProps) {
                 onClick={() => handleQuestionClick(question.id)}
                 disabled={!isAvailable}
                 className={cn(
-                  'jeopardy-board aspect-square flex items-center justify-center text-lg font-bold transition-all duration-300',
+                  'jeopardy-cell aspect-square flex items-center justify-center text-lg font-bold transition-all duration-300',
                   'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-400',
+                  'animate-scale-in',
                   {
                     'opacity-50 cursor-not-allowed': !isAvailable,
-                    'animate-blink bg-yellow-400 text-black': isSelected,
+                    'animate-blink bg-yellow-400 text-black glow-effect-gold': isSelected,
                     'bg-gray-600 text-gray-300': isDone,
-                    'hover:bg-blue-500': isAvailable && !isSelected,
+                    'hover:bg-blue-500 hover:shadow-xl': isAvailable && !isSelected,
                   }
                 )}
+                style={{ 
+                  animationDelay: `${(value / 100 - 1) * 0.05 + (categories.indexOf(category)) * 0.02}s` 
+                }}
               >
-                {isDone ? '✓' : `$${value}`}
+                <span className="text-shadow">
+                  {isDone ? '✓' : `$${value}`}
+                </span>
               </button>
             )
           })

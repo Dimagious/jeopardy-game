@@ -12,9 +12,9 @@ export default function Scoreboard({ className, variant = 'host' }: ScoreboardPr
   const isScreen = variant === 'screen'
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('w-full animate-fade-in', className)}>
       <h2 className={cn(
-        'font-bold mb-6 text-center',
+        'font-bold mb-6 text-center text-shadow animate-slide-up',
         isScreen ? 'screen-text-xl' : 'text-xl'
       )}>
         Счёт команд
@@ -24,20 +24,21 @@ export default function Scoreboard({ className, variant = 'host' }: ScoreboardPr
         'space-y-4',
         isScreen ? 'space-y-6' : 'space-y-3'
       )}>
-        {teams.map((team) => {
+        {teams.map((team, index) => {
           const score = getTeamScore(team.id)
           
           return (
             <div
               key={team.id}
               className={cn(
-                'flex items-center justify-between',
+                'flex items-center justify-between animate-scale-in',
                 isScreen ? 'space-x-6' : 'space-x-3'
               )}
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex items-center space-x-3">
                 <div className={cn(
-                  'rounded-full',
+                  'rounded-full transition-all duration-300',
                   {
                     'w-3 h-3': !isScreen,
                     'w-6 h-6': isScreen,
@@ -47,14 +48,14 @@ export default function Scoreboard({ className, variant = 'host' }: ScoreboardPr
                   }
                 )}></div>
                 <div className={cn(
-                  'font-semibold',
+                  'font-semibold text-shadow',
                   isScreen ? 'screen-text-lg' : 'text-base'
                 )}>
                   {team.name}
                 </div>
               </div>
               <div className={cn(
-                'font-bold text-jeopardy-gold',
+                'font-bold text-jeopardy-gold text-shadow-lg transition-all duration-300',
                 isScreen ? 'screen-text-2xl' : 'text-xl'
               )}>
                 ${score}
