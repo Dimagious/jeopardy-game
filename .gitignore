@@ -34,3 +34,5 @@ junit.xml
 docker-data/
 *.pid
 docs/CURSOR_RULES.md
+*.tsbuildinfo
+tsconfig.*.tsbuildinfo
