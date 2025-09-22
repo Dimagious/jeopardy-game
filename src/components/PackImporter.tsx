@@ -118,13 +118,13 @@ export default function PackImporter({ onPackImported, className }: PackImporter
           {/* Выбор типа импорта */}
           <div className="flex space-x-4">
             <Button
-              variant={importType === 'csv' ? 'default' : 'secondary'}
+              variant={importType === 'csv' ? 'primary' : 'secondary'}
               onClick={() => setImportType('csv')}
             >
               CSV
             </Button>
             <Button
-              variant={importType === 'json' ? 'default' : 'secondary'}
+              variant={importType === 'json' ? 'primary' : 'secondary'}
               onClick={() => setImportType('json')}
             >
               JSON

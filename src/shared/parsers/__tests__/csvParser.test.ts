@@ -14,11 +14,11 @@ describe('CSV Parser', () => {
       expect(result.pack).toBeDefined()
       expect(result.pack?.title).toBe('Тестовый пакет')
       expect(result.pack?.categories).toHaveLength(2)
-      expect(result.pack?.categories[0].name).toBe('История')
-      expect(result.pack?.categories[0].questions).toHaveLength(1)
-      expect(result.pack?.categories[0].questions[0].value).toBe(100)
-      expect(result.pack?.categories[0].questions[0].text).toBe('В каком году началась Вторая мировая война?')
-      expect(result.pack?.categories[0].questions[0].answer).toBe('1939')
+      expect(result.pack?.categories?.[0]?.name).toBe('История')
+      expect(result.pack?.categories?.[0]?.questions).toHaveLength(1)
+      expect(result.pack?.categories?.[0]?.questions?.[0]?.value).toBe(100)
+      expect(result.pack?.categories?.[0]?.questions?.[0]?.text).toBe('В каком году началась Вторая мировая война?')
+      expect(result.pack?.categories?.[0]?.questions?.[0]?.answer).toBe('1939')
     })
 
     it('should handle CSV with quotes and commas in text', () => {
@@ -29,8 +29,8 @@ describe('CSV Parser', () => {
       const result = parseCSVPack(csvContent, 'Тестовый пакет')
 
       expect(result.isValid).toBe(true)
-      expect(result.pack?.categories[0].questions[0].text).toBe('Кто написал "Войну и мир"?')
-      expect(result.pack?.categories[1].questions[0].text).toBe('В каком году вышел фильм "Титаник"?')
+      expect(result.pack?.categories?.[0]?.questions?.[0]?.text).toBe('Кто написал "Войну и мир"?')
+      expect(result.pack?.categories?.[1]?.questions?.[0]?.text).toBe('В каком году вышел фильм "Титаник"?')
     })
 
     it('should validate CSV headers', () => {
@@ -114,9 +114,9 @@ describe('CSV Parser', () => {
       const result = parseCSVPack(csvContent, 'Тестовый пакет')
 
       expect(result.isValid).toBe(true)
-      expect(result.pack?.categories[0].name).toBe('Астрономия')
-      expect(result.pack?.categories[1].name).toBe('Биология')
-      expect(result.pack?.categories[2].name).toBe('Зоология')
+      expect(result.pack?.categories?.[0]?.name).toBe('Астрономия')
+      expect(result.pack?.categories?.[1]?.name).toBe('Биология')
+      expect(result.pack?.categories?.[2]?.name).toBe('Зоология')
     })
 
     it('should sort questions by value within categories', () => {
@@ -128,9 +128,9 @@ describe('CSV Parser', () => {
       const result = parseCSVPack(csvContent, 'Тестовый пакет')
 
       expect(result.isValid).toBe(true)
-      expect(result.pack?.categories[0].questions[0].value).toBe(100)
-      expect(result.pack?.categories[0].questions[1].value).toBe(200)
-      expect(result.pack?.categories[0].questions[2].value).toBe(300)
+      expect(result.pack?.categories?.[0]?.questions?.[0]?.value).toBe(100)
+      expect(result.pack?.categories?.[0]?.questions?.[1]?.value).toBe(200)
+      expect(result.pack?.categories?.[0]?.questions?.[2]?.value).toBe(300)
     })
   })
 

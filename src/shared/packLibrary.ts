@@ -50,7 +50,7 @@ export function addPackToLibrary(pack: QuestionPack): void {
     // Обновляем существующий пакет
     library.packs[existingIndex] = {
       ...pack,
-      createdAt: library.packs[existingIndex].createdAt, // Сохраняем оригинальную дату создания
+      createdAt: library.packs[existingIndex]?.createdAt || new Date().toISOString(), // Сохраняем оригинальную дату создания
     }
   } else {
     // Добавляем новый пакет
