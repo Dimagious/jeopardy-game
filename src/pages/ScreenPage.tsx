@@ -6,14 +6,18 @@ import { analytics } from '../shared/analytics'
 
 export default function ScreenPage() {
   const { gameId } = useParams<{ gameId: string }>()
-  const { initializeGame } = useGameStore()
+  const { initializeGame, hasActiveGame } = useGameStore()
 
   useEffect(() => {
     if (gameId) {
       analytics.screenPageView(gameId)
-      initializeGame(gameId)
+      
+      // Если есть активная игра, не переинициализируем
+      if (!hasActiveGame()) {
+        initializeGame(gameId)
+      }
     }
-  }, [gameId, initializeGame])
+  }, [gameId, initializeGame, hasActiveGame])
 
   return <Screen />
 }

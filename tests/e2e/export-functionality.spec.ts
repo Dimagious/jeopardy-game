@@ -5,6 +5,14 @@ test.describe('Export Functionality', () => {
     // Переходим на страницу пульта ведущего
     await page.goto('/host/demo-game')
     await page.waitForLoadState('networkidle')
+    
+    // Обрабатываем модальное окно восстановления игры (если появляется)
+    const restoreModal = page.locator('[data-testid="game-restore-modal"]')
+    if (await restoreModal.isVisible()) {
+      // Выбираем "Новая игра" чтобы начать с чистого листа
+      await page.getByRole('button', { name: 'Новая игра' }).click()
+      await page.waitForTimeout(500) // Даем время на закрытие модального окна
+    }
   })
 
   test('should export results to CSV after answering questions', async ({ page }) => {
