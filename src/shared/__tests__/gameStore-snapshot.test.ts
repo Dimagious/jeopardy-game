@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useGameStore } from '../gameStore'
-import { Game, Team, Category, Question, GameState } from '../types'
 
 describe('GameStore - Snapshot Functionality', () => {
   beforeEach(() => {

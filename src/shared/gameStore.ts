@@ -5,6 +5,17 @@ import { GameEvent, createGameEvent } from './events'
 import { analytics } from './analytics'
 import { exportToCSV, downloadCSV, generateExportFilename, ExportData } from './exportUtils'
 
+// Интерфейс для снапшота игры
+interface GameSnapshot {
+  game: Game | null
+  categories: Category[]
+  questions: Question[]
+  teams: Team[]
+  scoreEvents: ScoreEvent[]
+  gameState: GameState | null
+  lastSaved: number
+}
+
 // Демо-данные для тестирования
 const DEMO_CATEGORIES: Category[] = [
   { id: 'cat-1', gameId: 'demo-game', name: 'История', order: 1 },
@@ -96,8 +107,8 @@ interface GameStore {
   
   // Снапшоты состояния
   hasActiveGame: () => boolean
-  getGameSnapshot: () => any
-  restoreGameSnapshot: (snapshot: any) => void
+  getGameSnapshot: () => GameSnapshot
+  restoreGameSnapshot: (snapshot: GameSnapshot) => void
   clearGame: () => void
   createAutoSnapshot: () => void
 }
@@ -389,7 +400,7 @@ export const useGameStore = create<GameStore>()(
         }
       },
 
-      restoreGameSnapshot: (snapshot: any) => {
+      restoreGameSnapshot: (snapshot: GameSnapshot) => {
         set({
           game: snapshot.game,
           categories: snapshot.categories,
