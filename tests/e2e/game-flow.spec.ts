@@ -14,7 +14,7 @@ test.describe('Jeopardy Game Flow', () => {
     // Проверяем категории
     await expect(page.getByText('История')).toBeVisible()
     await expect(page.getByText('Наука')).toBeVisible()
-    await expect(page.getByText('Спорт')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Спорт', exact: true })).toBeVisible()
     await expect(page.getByText('Кино')).toBeVisible()
     await expect(page.getByText('География')).toBeVisible()
     
