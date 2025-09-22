@@ -15,6 +15,7 @@ export default function HostPanel({ className }: HostPanelProps) {
     toggleAnswer,
     judgeAnswer,
     getTeamScore,
+    exportResults,
   } = useGameStore()
 
   const selectedTeam = gameState?.selectedTeam
@@ -69,6 +70,10 @@ export default function HostPanel({ className }: HostPanelProps) {
     if (selectedTeam) {
       judgeAnswer(selectedTeam, false)
     }
+  }
+
+  const handleExport = () => {
+    exportResults()
   }
 
   return (
@@ -189,6 +194,25 @@ export default function HostPanel({ className }: HostPanelProps) {
               )
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Экспорт результатов */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Экспорт результатов</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={handleExport}
+          >
+            📊 Экспорт в CSV
+          </Button>
+          <p className="text-sm text-gray-400 mt-2 text-center">
+            Скачать результаты игры в формате CSV
+          </p>
         </CardContent>
       </Card>
     </div>

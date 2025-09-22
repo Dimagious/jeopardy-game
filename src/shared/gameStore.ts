@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { Game, Team, Category, Question, ScoreEvent, GameState } from './types'
 import { GameEvent, createGameEvent } from './events'
 import { analytics } from './analytics'
+import { exportToCSV, downloadCSV, generateExportFilename, ExportData } from './exportUtils'
 
 // Демо-данные для тестирования
 const DEMO_CATEGORIES: Category[] = [
@@ -84,6 +85,7 @@ interface GameStore {
   judgeAnswer: (teamId: string, correct: boolean) => void
   selectTeam: (teamId: string) => void
   resetGame: () => void
+  exportResults: () => void
   
   // Утилиты
   getQuestionById: (id: string) => Question | undefined
@@ -302,6 +304,33 @@ export const useGameStore = create<GameStore>()(
           scoreEvents: [],
           gameState: null,
         })
+      },
+
+      // Экспорт результатов
+      exportResults: () => {
+        const { game, scoreEvents, teams, questions } = get()
+        
+        if (!game || scoreEvents.length === 0) {
+          console.warn('Нет данных для экспорта')
+          return
+        }
+
+        const exportDate = new Date().toISOString()
+        const exportData: ExportData = {
+          scoreEvents,
+          teams,
+          questions,
+          gameTitle: game.title,
+          exportDate,
+        }
+
+        const csvContent = exportToCSV(exportData)
+        const filename = generateExportFilename(game.title, exportDate)
+        
+        downloadCSV(csvContent, filename)
+        
+        // Отправляем аналитику
+        analytics.exportResults(game.id, scoreEvents.length)
       },
 
       // Утилиты

@@ -9,6 +9,7 @@ export type AnalyticsEvent =
   | 'login'
   | 'host_page_view'
   | 'screen_page_view'
+  | 'export_results'
 
 interface AnalyticsEventData {
   gameId?: string
@@ -17,6 +18,7 @@ interface AnalyticsEventData {
   playerId?: string
   correct?: boolean
   delta?: number
+  eventCount?: number
   [key: string]: string | number | boolean | undefined
 }
 
@@ -72,6 +74,10 @@ class Analytics {
 
   screenPageView(gameId: string) {
     this.track('screen_page_view', { gameId })
+  }
+
+  exportResults(gameId: string, eventCount: number) {
+    this.track('export_results', { gameId, eventCount })
   }
 }
 
