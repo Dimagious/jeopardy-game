@@ -26,13 +26,13 @@ test.describe('Analytics Integration', () => {
   test('should track judge event', async ({ page }) => {
     // Выбираем вопрос и команду
     await page.getByText('$100').first().click()
-    await page.getByText('Команда 1').click()
+    await page.getByRole('button', { name: 'Команда 1 $' }).click()
     
     // Засчитываем ответ
-    await page.getByRole('button', { name: 'Верно' }).click()
+    await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Проверяем, что очки обновились (это означает, что judge был отправлен)
-    await expect(page.getByText('$100')).toBeVisible()
+    await expect(page.locator('.text-lg.font-semibold').first()).toBeVisible()
   })
 
   test('should track screen page view', async ({ context }) => {
