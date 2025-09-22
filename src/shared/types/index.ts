@@ -8,6 +8,22 @@ export interface Game {
   createdAt: string
 }
 
+// Локальное состояние игры
+export interface GameState {
+  gameId: string
+  currentQuestion: {
+    id: string
+    categoryId: string
+    value: number
+    text: string
+    answer: string
+    showAnswer: boolean
+  } | null
+  selectedTeam: string | null
+  isQuestionOpen: boolean
+  lastUpdated: number
+}
+
 export interface Team {
   id: string
   gameId: string
