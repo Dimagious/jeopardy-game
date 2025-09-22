@@ -15,15 +15,31 @@ html, body, #root {
 /* Кастомные компоненты для Jeopardy */
 @layer components {
   .jeopardy-board {
-    @apply bg-jeopardy-blue text-white rounded-lg shadow-lg;
+    @apply bg-jeopardy-blue text-white rounded-lg shadow-lg transition-all duration-300;
   }
   
   .jeopardy-question {
-    @apply bg-jeopardy-blue text-white text-center p-6 rounded-lg shadow-lg;
+    @apply bg-jeopardy-blue text-white text-center p-6 rounded-lg shadow-lg transition-all duration-300;
   }
   
   .jeopardy-answer {
-    @apply bg-jeopardy-gold text-black text-center p-6 rounded-lg shadow-lg font-bold;
+    @apply bg-jeopardy-gold text-black text-center p-6 rounded-lg shadow-lg font-bold transition-all duration-300;
+  }
+  
+  .jeopardy-cell {
+    @apply bg-jeopardy-blue text-white text-center p-4 rounded-lg shadow-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-xl;
+  }
+  
+  .jeopardy-cell:hover {
+    @apply bg-blue-700;
+  }
+  
+  .jeopardy-cell.selected {
+    @apply animate-blink bg-yellow-500 text-black;
+  }
+  
+  .jeopardy-cell.completed {
+    @apply bg-gray-600 text-gray-400 cursor-not-allowed;
   }
 }
 
@@ -32,15 +48,44 @@ html, body, #root {
 }
 
 .screen-text-lg {
-  @apply text-5xl text-white font-bold;
+  @apply text-screen-lg text-white font-bold;
 }
 
 .screen-text-xl {
-  @apply text-6xl text-white font-bold;
+  @apply text-screen-xl text-white font-bold;
 }
 
 .screen-text-2xl {
-  @apply text-7xl text-white font-bold;
+  @apply text-screen-2xl text-white font-bold;
+}
+
+.screen-text-3xl {
+  @apply text-screen-3xl text-white font-bold;
+}
+
+.screen-text-4xl {
+  @apply text-screen-4xl text-white font-bold;
+}
+
+/* TV адаптивные размеры */
+.tv-text-sm {
+  @apply text-tv-sm text-white font-semibold;
+}
+
+.tv-text-md {
+  @apply text-tv-md text-white font-bold;
+}
+
+.tv-text-lg {
+  @apply text-tv-lg text-white font-bold;
+}
+
+.tv-text-xl {
+  @apply text-tv-xl text-white font-bold;
+}
+
+.tv-text-2xl {
+  @apply text-tv-2xl text-white font-bold;
 }
 
 /* Анимации для экрана */
@@ -48,11 +93,87 @@ html, body, #root {
   animation: blink 0.9s ease-in-out;
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Safe areas для разных устройств */
 .safe-area {
   padding: 5%;
 }
 
+.safe-area-tv {
+  padding: 3%;
+}
+
+.safe-area-mobile {
+  padding: 8%;
+}
+
+/* Улучшенные тени и эффекты */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(6, 12, 233, 0.5);
+}
+
+.glow-effect-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* Контрастные текстовые тени для лучшей читаемости */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.text-shadow-lg {
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+}
+
+.text-shadow-xl {
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 1);
+}
+
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(6, 12, 233, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(6, 12, 233, 0.8), 0 0 30px rgba(6, 12, 233, 0.6); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }

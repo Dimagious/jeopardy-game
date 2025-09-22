@@ -85,18 +85,18 @@ export default function HostPanel({ className }: HostPanelProps) {
         </CardHeader>
         <CardContent>
           {gameState?.currentQuestion ? (
-            <div className="space-y-4">
-              <div className="jeopardy-question min-h-[200px] flex flex-col justify-center">
-                <div className="text-lg font-semibold mb-2">
+            <div className="space-y-4 animate-fade-in">
+              <div className="jeopardy-question min-h-[200px] flex flex-col justify-center animate-scale-in glow-effect">
+                <div className="text-lg font-semibold mb-2 text-shadow animate-slide-up">
                   ${gameState.currentQuestion.value}
                 </div>
-                <div className="text-xl mb-4">
+                <div className="text-xl mb-4 text-shadow animate-slide-up">
                   {gameState.currentQuestion.text}
                 </div>
                 {gameState.currentQuestion.showAnswer && (
-                  <div className="jeopardy-answer mt-4">
-                    <div className="text-lg font-semibold mb-2">Ответ:</div>
-                    <div className="text-xl">
+                  <div className="jeopardy-answer mt-4 animate-fade-in glow-effect-gold">
+                    <div className="text-lg font-semibold mb-2 text-shadow">Ответ:</div>
+                    <div className="text-xl text-shadow">
                       {gameState.currentQuestion.answer}
                     </div>
                   </div>
