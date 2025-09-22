@@ -143,13 +143,13 @@ describe('GameStore - Snapshot Functionality', () => {
       
       createAutoSnapshot()
       
-      const snapshotCall = localStorage.setItem.mock.calls.find(
-        call => call[0] === 'jeopardy-game-snapshot'
+      const snapshotCall = vi.mocked(localStorage.setItem).mock.calls.find(
+        (call: any) => call[0] === 'jeopardy-game-snapshot'
       )
       
       expect(snapshotCall).toBeDefined()
       
-      const snapshot = JSON.parse(snapshotCall[1])
+      const snapshot = JSON.parse(snapshotCall![1])
       expect(snapshot).toHaveProperty('game')
       expect(snapshot).toHaveProperty('categories')
       expect(snapshot).toHaveProperty('questions')
