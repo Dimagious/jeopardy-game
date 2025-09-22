@@ -112,10 +112,10 @@ describe('GameStore - Simple Tests', () => {
 
     const updated = markQuestionDone(questions, 'q1')
     
-    expect(updated[0].isDone).toBe(true)
-    expect(updated[0].isLocked).toBe(true)
-    expect(updated[1].isDone).toBe(false)
-    expect(updated[1].isLocked).toBe(false)
+    expect(updated[0]?.isDone).toBe(true)
+    expect(updated[0]?.isLocked).toBe(true)
+    expect(updated[1]?.isDone).toBe(false)
+    expect(updated[1]?.isLocked).toBe(false)
   })
 
   it('should handle score calculation', () => {
