@@ -8,9 +8,10 @@ interface ModalProps {
   title?: string
   children: ReactNode
   className?: string
+  'data-testid'?: string
 }
 
-export default function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, className, 'data-testid': dataTestId }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -40,10 +41,13 @@ export default function Modal({ isOpen, onClose, title, children, className }: M
       />
       
       {/* Modal */}
-      <div className={cn(
-        'relative bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto',
-        className
-      )}>
+      <div 
+        className={cn(
+          'relative bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto',
+          className
+        )}
+        data-testid={dataTestId}
+      >
         {title && (
           <div className="flex items-center justify-between p-6 border-b border-gray-700">
             <h2 className="text-xl font-semibold text-white">{title}</h2>

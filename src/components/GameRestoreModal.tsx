@@ -44,7 +44,7 @@ export default function GameRestoreModal({
   const lastUpdated = new Date(gameState.lastUpdated).toLocaleString()
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} data-testid="game-restore-modal">
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-2xl text-center animate-fade-in">
