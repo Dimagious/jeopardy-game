@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,4 +10,49 @@
 
 html, body, #root {
   height: 100%;
+}
+
+/* Кастомные компоненты для Jeopardy */
+@layer components {
+  .jeopardy-board {
+    @apply bg-jeopardy-blue text-white rounded-lg shadow-lg;
+  }
+  
+  .jeopardy-question {
+    @apply bg-jeopardy-blue text-white text-center p-6 rounded-lg shadow-lg;
+  }
+  
+  .jeopardy-answer {
+    @apply bg-jeopardy-gold text-black text-center p-6 rounded-lg shadow-lg font-bold;
+  }
+}
+
+.screen-text {
+  @apply text-white font-bold;
+}
+
+.screen-text-lg {
+  @apply text-5xl text-white font-bold;
+}
+
+.screen-text-xl {
+  @apply text-6xl text-white font-bold;
+}
+
+.screen-text-2xl {
+  @apply text-7xl text-white font-bold;
+}
+
+/* Анимации для экрана */
+.animate-blink {
+  animation: blink 0.9s ease-in-out;
+}
+
+.safe-area {
+  padding: 5%;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
