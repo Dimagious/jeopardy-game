@@ -93,6 +93,13 @@ interface GameStore {
   getTeamById: (id: string) => Team | undefined
   getTeamScore: (teamId: string) => number
   isQuestionAvailable: (questionId: string) => boolean
+  
+  // Снапшоты состояния
+  hasActiveGame: () => boolean
+  getGameSnapshot: () => any
+  restoreGameSnapshot: (snapshot: any) => void
+  clearGame: () => void
+  createAutoSnapshot: () => void
 }
 
 // Локальная шина событий (мок Realtime)
@@ -190,6 +197,9 @@ export const useGameStore = create<GameStore>()(
 
         set({ gameState: newGameState })
 
+        // Создаем автоснапшот
+        get().createAutoSnapshot()
+
         // Публикуем событие
         const event = createGameEvent.boardSelect(
           game.id,
@@ -264,6 +274,9 @@ export const useGameStore = create<GameStore>()(
           scoreEvents: [...scoreEvents, newScoreEvent],
           gameState: newGameState,
         })
+
+        // Создаем автоснапшот
+        get().createAutoSnapshot()
 
         // Публикуем события
         const judgeEvent = createGameEvent.judge(
@@ -355,6 +368,69 @@ export const useGameStore = create<GameStore>()(
       isQuestionAvailable: (questionId: string) => {
         const question = get().questions.find(q => q.id === questionId)
         return question ? !question.isDone && !question.isLocked : false
+      },
+
+      // Снапшоты состояния
+      hasActiveGame: () => {
+        const state = get()
+        return state.game !== null && state.gameState !== null
+      },
+
+      getGameSnapshot: () => {
+        const state = get()
+        return {
+          game: state.game,
+          categories: state.categories,
+          questions: state.questions,
+          teams: state.teams,
+          scoreEvents: state.scoreEvents,
+          gameState: state.gameState,
+          lastSaved: Date.now(),
+        }
+      },
+
+      restoreGameSnapshot: (snapshot: any) => {
+        set({
+          game: snapshot.game,
+          categories: snapshot.categories,
+          questions: snapshot.questions,
+          teams: snapshot.teams,
+          scoreEvents: snapshot.scoreEvents,
+          gameState: snapshot.gameState,
+        })
+      },
+
+      clearGame: () => {
+        set({
+          game: null,
+          categories: [],
+          questions: [],
+          teams: [],
+          scoreEvents: [],
+          gameState: null,
+        })
+      },
+
+      // Автоснапшоты
+      createAutoSnapshot: () => {
+        const state = get()
+        if (state.game && state.gameState) {
+          const snapshot = {
+            game: state.game,
+            categories: state.categories,
+            questions: state.questions,
+            teams: state.teams,
+            scoreEvents: state.scoreEvents,
+            gameState: state.gameState,
+            lastSaved: Date.now(),
+          }
+          
+          // Сохраняем в localStorage для быстрого восстановления
+          localStorage.setItem('jeopardy-game-snapshot', JSON.stringify(snapshot))
+          
+          // Отправляем событие для синхронизации экрана
+          // eventBus.publish(createGameEvent('GAME_SNAPSHOT', { snapshot }))
+        }
       },
     }),
     {
