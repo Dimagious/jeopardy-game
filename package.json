@@ -15,7 +15,8 @@
     "test:ui": "vitest",
     "e2e": "playwright test",
     "prepare": "husky install",
-    "tree": "tree -L 3 -I 'node_modules'"
+    "tree": "tree -L 3 -I 'node_modules'",
+    "precommit": "npm run lint && npm run typecheck && npm run test && npm run e2e"
   },
   "dependencies": {
     "@sentry/react": "^10.13.0",
