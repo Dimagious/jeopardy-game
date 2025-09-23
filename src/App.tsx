@@ -32,6 +32,14 @@ function App() {
             } 
           />
           <Route 
+            path="/host/:gameId/:mode" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <HostPage />
+              </Suspense>
+            } 
+          />
+          <Route 
             path="/screen/:gameId" 
             element={
               <Suspense fallback={<PageLoader />}>
