@@ -6,7 +6,7 @@ import { cn } from '../shared/utils'
 
 interface BuzzerPanelProps {
   className?: string
-  gameId?: string
+  gameId: string
 }
 
 const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanelProps) {
