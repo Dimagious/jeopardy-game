@@ -5,6 +5,7 @@ import { useSessionStore, sessionUtils } from '../shared/sessionStore'
 import { useGameStore } from '../shared/gameStore'
 import { analytics } from '../shared/analytics'
 import { cn } from '../shared/utils'
+import { buzzDebouncer } from '../shared/rateLimiter'
 
 export default function PlayerPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
@@ -85,13 +86,19 @@ export default function PlayerPage() {
   const handleBuzz = () => {
     if (!sessionId || !currentPlayer) return
 
-    const buzzEvent = buzzPlayer(sessionId, currentPlayer.id)
-    if (buzzEvent) {
-      analytics.buzzFirst(sessionId, currentPlayer.id, currentPlayer.name)
-      // Обновляем buzz состояние
-      const state = getBuzzState(sessionId)
-      setBuzzState(state)
-    }
+    // Используем debounce для предотвращения множественных нажатий
+    buzzDebouncer.debounce(
+      `buzz-${currentPlayer.id}`,
+      () => {
+        const buzzEvent = buzzPlayer(sessionId, currentPlayer.id)
+        if (buzzEvent) {
+          analytics.buzzFirst(sessionId, currentPlayer.id, currentPlayer.name)
+          // Обновляем buzz состояние
+          const state = getBuzzState(sessionId)
+          setBuzzState(state)
+        }
+      }
+    )
   }
 
   // Если сессия не найдена
