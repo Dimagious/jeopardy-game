@@ -1,13 +1,15 @@
-import { memo, useState, useEffect } from 'react'
+import { memo, useState } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useGameStore } from '../shared/gameStore'
+import { useSessionStore } from '../shared/sessionStore'
 import { cn } from '../shared/utils'
 
 interface BuzzerPanelProps {
   className?: string
+  gameId: string
 }
 
-const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
+const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanelProps) {
   const {
     gameState,
     teams,
@@ -19,58 +21,46 @@ const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
     resetCurrentQuestion,
   } = useGameStore()
 
-  const [sessionActive, setSessionActive] = useState(false)
-  const [sessionPin, setSessionPin] = useState<string | null>(null)
-  const [connectedPlayers, setConnectedPlayers] = useState<string[]>([])
+  const {
+    currentSession,
+    createSession,
+    stopSession
+  } = useSessionStore()
+
   const [buzzWinner, setBuzzWinner] = useState<string | null>(null)
   const [buzzTimer, setBuzzTimer] = useState<number | null>(null)
 
   const selectedTeam = gameState?.selectedTeam
 
-  // Генерация PIN для сессии
-  const generatePin = (): string => {
-    const pin = Math.floor(100000 + Math.random() * 900000).toString()
-    setSessionPin(pin)
-    return pin
-  }
-
   // Запуск сессии
   const startSession = () => {
-    const pin = generatePin()
-    setSessionActive(true)
-    // В реальной реализации здесь будет отправка на сервер
-    console.log('Session started with PIN:', pin)
+    if (!gameId) {
+      console.error('GameId is required to start session')
+      return
+    }
+    
+    const session = createSession(gameId, 50) // Максимум 50 игроков
+    console.log('Session started with PIN:', session.pin)
   }
 
   // Остановка сессии
-  const stopSession = () => {
-    setSessionActive(false)
-    setSessionPin(null)
-    setConnectedPlayers([])
-    setBuzzWinner(null)
-    setBuzzTimer(null)
+  const handleStopSession = () => {
+    if (currentSession) {
+      stopSession(currentSession.id)
+      setBuzzWinner(null)
+      setBuzzTimer(null)
+      console.log('Session stopped')
+    }
   }
 
-  // Симуляция подключения игроков (для демо)
-  useEffect(() => {
-    if (sessionActive && sessionPin) {
-      const interval = setInterval(() => {
-        if (connectedPlayers.length < 8) { // Максимум 8 игроков для демо
-          const playerName = `Игрок ${connectedPlayers.length + 1}`
-          setConnectedPlayers(prev => [...prev, playerName])
-        }
-      }, 3000) // Каждые 3 секунды добавляем игрока
-
-      return () => clearInterval(interval)
-    }
-  }, [sessionActive, sessionPin, connectedPlayers.length])
+  // Демо-функциональность отключена - только реальные игроки
 
   // Симуляция buzz события (для демо)
   const simulateBuzz = () => {
-    if (connectedPlayers.length > 0 && !buzzWinner) {
-      const winner = connectedPlayers[Math.floor(Math.random() * connectedPlayers.length)]
+    if (currentSession && currentSession.players.length > 0 && !buzzWinner) {
+      const winner = currentSession.players[Math.floor(Math.random() * currentSession.players.length)]
       if (winner) {
-        setBuzzWinner(winner)
+        setBuzzWinner(winner.name)
         setBuzzTimer(3) // 3 секунды на ответ
       }
       
@@ -99,7 +89,7 @@ const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!sessionActive ? (
+          {!currentSession?.isActive ? (
             <div className="space-y-4">
               <p className="text-gray-300">
                 Запустите сессию, чтобы участники могли подключиться по PIN
@@ -116,16 +106,16 @@ const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
               <div className="bg-green-900 p-4 rounded-lg border border-green-600">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-100 mb-2">
-                    PIN: {sessionPin}
+                    PIN: {currentSession.pin}
                   </div>
                   <div className="text-sm text-green-300">
-                    Участники подключаются по ссылке: /p/{sessionPin}
+                    Участники подключаются по ссылке: /p/{currentSession.pin}
                   </div>
                 </div>
               </div>
               
               <Button 
-                onClick={stopSession}
+                onClick={handleStopSession}
                 variant="secondary"
                 className="w-full"
               >
@@ -137,33 +127,39 @@ const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
       </Card>
 
       {/* Подключенные игроки */}
-      {sessionActive && (
+      {currentSession?.isActive && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Подключенные игроки ({connectedPlayers.length})</CardTitle>
+            <CardTitle>Подключенные игроки ({currentSession.players.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {connectedPlayers.length > 0 ? (
+            {currentSession.players.length > 0 ? (
               <div className="space-y-2">
-                {connectedPlayers.map((player, index) => (
+                {currentSession.players.map((player, index) => (
                   <div 
                     key={index}
                     className="flex items-center justify-between p-2 bg-gray-800 rounded"
                   >
-                    <span className="text-white">{player}</span>
+                    <span className="text-white">{player.name}</span>
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-center">Ожидание подключения игроков...</p>
+              <div className="text-center text-gray-400">
+                <p>Ожидание подключения игроков...</p>
+                <p className="text-sm mt-2">
+                  Игроки подключаются по ссылке: <br/>
+                  <span className="font-mono text-jeopardy-gold">/p/{currentSession.pin}</span>
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
       )}
 
-      {/* Buzzer кнопка (для демо) */}
-      {sessionActive && connectedPlayers.length > 0 && gameState?.currentQuestion && (
+      {/* Buzzer кнопка - только для реальных игроков */}
+      {currentSession?.isActive && currentSession.players.length > 0 && gameState?.currentQuestion && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Жужалка</CardTitle>
@@ -204,10 +200,10 @@ const BuzzerPanel = memo(function BuzzerPanel({ className }: BuzzerPanelProps) {
                   onClick={simulateBuzz}
                   className="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-lg py-4"
                 >
-                  🎯 Симулировать buzz
+                  🎯 Симулировать buzz (тест)
                 </Button>
                 <p className="text-sm text-gray-400 mt-2">
-                  В реальной игре игроки будут нажимать эту кнопку
+                  Только для тестирования. В реальной игре игроки нажимают кнопку на своих устройствах
                 </p>
               </div>
             )}

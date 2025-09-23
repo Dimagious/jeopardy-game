@@ -113,9 +113,9 @@ export default function HostPage() {
             </Card>
           </div>
           
-          {/* Controls */}
-          <div className="space-y-6">
-            {gameMode === 'buzzer' ? <BuzzerPanel /> : <HostPanel />}
+              {/* Controls */}
+              <div className="space-y-6">
+                {gameMode === 'buzzer' && gameId ? <BuzzerPanel gameId={gameId} /> : <HostPanel />}
             
             {/* Scoreboard */}
             <Card>
