@@ -1,69 +1,47 @@
-# React + TypeScript + Vite
+# Jeopardy Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Игровое web-приложение под формат Jeopardy для офлайн/онлайн мероприятий.
 
-Currently, two official plugins are available:
+## 🎯 Текущий статус
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**US-001: Каркас проекта** - ✅ Завершено
+**US-002: Экран «Поле» и «Пульт» локально** - ✅ Завершено
 
-## Expanding the ESLint configuration
+- Базовый каркас Vite + React + TypeScript + Tailwind
+- Страницы: `/login`, `/host/:gameId`, `/screen/:gameId`
+- UI-кит компонентов и дизайн-система
+- Sentry и аналитика
+- GitHub Actions CI/CD
+- **НОВОЕ**: Интерактивное игровое поле с демо-данными
+- **НОВОЕ**: Пульт ведущего с горячими клавишами
+- **НОВОЕ**: Экран для отображения с синхронизацией
+- **НОВОЕ**: Локальная модель данных и события Realtime
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Быстрый старт
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Требования
+- Node.js 20.11+ (рекомендуется 20.19+)
+- npm 10.2+
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Запуск
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Откроется http://localhost:5173
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📚 Документация
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- [Backlog и архитектура](docs/backlog.md)
+- [User Stories](docs/user-stories/)
+- [US-001: Каркас проекта](docs/user-stories/US-001-scaffold.md)
+
+## 🏗️ Технологии
+
+- **Frontend**: React + Vite + TypeScript + React Router
+- **Стили**: Tailwind CSS v3.4.0
+- **Состояние**: Zustand (готов к подключению)
+- **Мониторинг**: Sentry + аналитика
+- **CI/CD**: GitHub Actions
+
