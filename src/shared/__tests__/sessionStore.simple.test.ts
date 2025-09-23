@@ -430,4 +430,111 @@ describe('sessionUtils', () => {
       })
     })
   })
+
+  // Team assignment tests
+  describe('Team assignment functionality', () => {
+    let session: { id: string; gameId: string; pin: string; isActive: boolean; createdAt: string; players: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }[]; buzzState: { isLocked: boolean; winner: { id: string; name: string } | null; lockExpiresAt: number | null; events: { id: string; sessionId: string; playerId: string; timestamp: number; isWinner: boolean }[] } }
+    let player1: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }
+    let player2: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }
+
+    beforeEach(() => {
+      const gameId = 'test-game-team'
+      session = useSessionStore.getState().createSession(gameId)
+      player1 = useSessionStore.getState().addPlayer(session.id, 'Player 1')
+      player2 = useSessionStore.getState().addPlayer(session.id, 'Player 2')
+    })
+
+    describe('assignPlayerToTeam', () => {
+      it('should assign player to team', () => {
+        const teamId = 'team-1'
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId)
+        
+        const playerTeam = useSessionStore.getState().getPlayerTeam(session.id, player1.id)
+        expect(playerTeam).toBe(teamId)
+      })
+
+      it('should update existing team assignment', () => {
+        const teamId1 = 'team-1'
+        const teamId2 = 'team-2'
+        
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId1)
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId2)
+        
+        const playerTeam = useSessionStore.getState().getPlayerTeam(session.id, player1.id)
+        expect(playerTeam).toBe(teamId2)
+      })
+    })
+
+    describe('removePlayerFromTeam', () => {
+      it('should remove player from team', () => {
+        const teamId = 'team-1'
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId)
+        useSessionStore.getState().removePlayerFromTeam(session.id, player1.id)
+        
+        const playerTeam = useSessionStore.getState().getPlayerTeam(session.id, player1.id)
+        expect(playerTeam).toBeNull()
+      })
+    })
+
+    describe('getPlayersByTeam', () => {
+      it('should return players assigned to team', () => {
+        const teamId = 'team-1'
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId)
+        useSessionStore.getState().assignPlayerToTeam(session.id, player2.id, teamId)
+        
+        const teamPlayers = useSessionStore.getState().getPlayersByTeam(session.id, teamId)
+        expect(teamPlayers).toHaveLength(2)
+        expect(teamPlayers.map(p => p.id)).toContain(player1.id)
+        expect(teamPlayers.map(p => p.id)).toContain(player2.id)
+      })
+
+      it('should return empty array for team with no players', () => {
+        const teamId = 'team-1'
+        const teamPlayers = useSessionStore.getState().getPlayersByTeam(session.id, teamId)
+        expect(teamPlayers).toEqual([])
+      })
+    })
+
+    describe('getTeamAssignments', () => {
+      it('should return all team assignments', () => {
+        const teamId1 = 'team-1'
+        const teamId2 = 'team-2'
+        
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId1)
+        useSessionStore.getState().assignPlayerToTeam(session.id, player2.id, teamId2)
+        
+        const assignments = useSessionStore.getState().getTeamAssignments(session.id)
+        expect(assignments[teamId1]!).toHaveLength(1)
+        expect(assignments[teamId2]!).toHaveLength(1)
+        expect(assignments[teamId1]![0]!.id).toBe(player1.id)
+        expect(assignments[teamId2]![0]!.id).toBe(player2.id)
+      })
+    })
+
+    describe('getUnassignedPlayers', () => {
+      it('should return players not assigned to any team', () => {
+        const teamId = 'team-1'
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId)
+        
+        const unassignedPlayers = useSessionStore.getState().getUnassignedPlayers(session.id)
+        expect(unassignedPlayers).toHaveLength(1)
+        expect(unassignedPlayers[0]!.id).toBe(player2.id)
+      })
+    })
+
+    describe('getPlayerTeam', () => {
+      it('should return team ID for assigned player', () => {
+        const teamId = 'team-1'
+        useSessionStore.getState().assignPlayerToTeam(session.id, player1.id, teamId)
+        
+        const playerTeam = useSessionStore.getState().getPlayerTeam(session.id, player1.id)
+        expect(playerTeam).toBe(teamId)
+      })
+
+      it('should return null for unassigned player', () => {
+        const playerTeam = useSessionStore.getState().getPlayerTeam(session.id, player1.id)
+        expect(playerTeam).toBeNull()
+      })
+    })
+  })
 })

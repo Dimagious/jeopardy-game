@@ -6,7 +6,7 @@ export interface Player {
   id: string
   sessionId: string
   name: string
-  teamId?: string
+  teamId?: string | null
   joinedAt: string
   isActive: boolean
 }
@@ -54,6 +54,13 @@ export interface SessionStore {
   removePlayer: (sessionId: string, playerId: string) => void
   updatePlayer: (sessionId: string, playerId: string, updates: Partial<Player>) => void
   assignPlayerToTeam: (sessionId: string, playerId: string, teamId: string) => void
+  
+  // Управление командами игроков
+  removePlayerFromTeam: (sessionId: string, playerId: string) => void
+  getPlayersByTeam: (sessionId: string, teamId: string) => Player[]
+  getTeamAssignments: (sessionId: string) => { [teamId: string]: Player[] }
+  getUnassignedPlayers: (sessionId: string) => Player[]
+  getPlayerTeam: (sessionId: string, playerId: string) => string | null
   
   // Buzz функциональность
   buzzPlayer: (sessionId: string, playerId: string) => BuzzEvent | null
@@ -410,6 +417,62 @@ export const useSessionStore = create<SessionStore>()(
               }
             : state.currentSession
         }))
+      },
+
+      // Управление командами игроков
+      removePlayerFromTeam: (sessionId: string, playerId: string) => {
+        set((state) => ({
+          sessions: state.sessions.map(s =>
+            s.id === sessionId
+              ? {
+                  ...s,
+                  players: s.players.map(p =>
+                    p.id === playerId ? { ...p, teamId: null } : p
+                  )
+                }
+              : s
+          ),
+          currentSession: state.currentSession?.id === sessionId
+            ? {
+                ...state.currentSession,
+                players: state.currentSession.players.map(p =>
+                  p.id === playerId ? { ...p, teamId: null } : p
+                )
+              }
+            : state.currentSession
+        }))
+      },
+
+      getPlayersByTeam: (sessionId: string, teamId: string) => {
+        const session = get().getSessionById(sessionId)
+        return session?.players.filter(p => p.teamId === teamId) || []
+      },
+
+      getTeamAssignments: (sessionId: string) => {
+        const session = get().getSessionById(sessionId)
+        if (!session) return {}
+
+        const assignments: { [teamId: string]: Player[] } = {}
+        session.players.forEach(player => {
+          if (player.teamId) {
+            if (!assignments[player.teamId]) {
+              assignments[player.teamId] = []
+            }
+            assignments[player.teamId]!.push(player)
+          }
+        })
+        return assignments
+      },
+
+      getUnassignedPlayers: (sessionId: string) => {
+        const session = get().getSessionById(sessionId)
+        return session?.players.filter(p => !p.teamId || p.teamId === null) || []
+      },
+
+      getPlayerTeam: (sessionId: string, playerId: string) => {
+        const session = get().getSessionById(sessionId)
+        const player = session?.players.find(p => p.id === playerId)
+        return player?.teamId || null
       }
     }),
     {

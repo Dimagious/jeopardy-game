@@ -16,6 +16,9 @@ export type AnalyticsEvent =
   | 'player_left'
   | 'pin_page_view'
   | 'player_page_view'
+  | 'player_assigned_to_team'
+  | 'player_removed_from_team'
+  | 'team_assignment_changed'
 
 interface AnalyticsEventData {
   gameId?: string
@@ -113,6 +116,19 @@ class Analytics {
 
   buzzFirst(sessionId: string, playerId: string, playerName: string) {
     this.track('buzz_first', { sessionId, playerId, playerName })
+  }
+
+  // Team assignment analytics
+  playerAssignedToTeam(sessionId: string, playerId: string, playerName: string, teamId: string, teamName: string) {
+    this.track('player_assigned_to_team', { sessionId, playerId, playerName, teamId, teamName })
+  }
+
+  playerRemovedFromTeam(sessionId: string, playerId: string, playerName: string, teamId: string, teamName: string) {
+    this.track('player_removed_from_team', { sessionId, playerId, playerName, teamId, teamName })
+  }
+
+  teamAssignmentChanged(sessionId: string, teamId: string, teamName: string, playerCount: number) {
+    this.track('team_assignment_changed', { sessionId, teamId, teamName, playerCount })
   }
 }
 
