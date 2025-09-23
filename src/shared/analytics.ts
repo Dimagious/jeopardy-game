@@ -10,12 +10,21 @@ export type AnalyticsEvent =
   | 'host_page_view'
   | 'screen_page_view'
   | 'export_results'
+  | 'session_start'
+  | 'session_stop'
+  | 'player_joined'
+  | 'player_left'
+  | 'pin_page_view'
+  | 'player_page_view'
 
 interface AnalyticsEventData {
   gameId?: string
   questionId?: string
   teamId?: string
   playerId?: string
+  sessionId?: string
+  pin?: string
+  playerName?: string
   correct?: boolean
   delta?: number
   eventCount?: number
@@ -78,6 +87,31 @@ class Analytics {
 
   exportResults(gameId: string, eventCount: number) {
     this.track('export_results', { gameId, eventCount })
+  }
+
+  // Session and player events
+  sessionStart(gameId: string, sessionId: string, pin: string) {
+    this.track('session_start', { gameId, sessionId, pin })
+  }
+
+  sessionStop(gameId: string, sessionId: string) {
+    this.track('session_stop', { gameId, sessionId })
+  }
+
+  playerJoined(sessionId: string, playerId: string, playerName: string) {
+    this.track('player_joined', { sessionId, playerId, playerName })
+  }
+
+  playerLeft(sessionId: string, playerId: string) {
+    this.track('player_left', { sessionId, playerId })
+  }
+
+  pinPageView(pin: string) {
+    this.track('pin_page_view', { pin })
+  }
+
+  playerPageView(sessionId: string) {
+    this.track('player_page_view', { sessionId })
   }
 }
 

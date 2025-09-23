@@ -115,7 +115,7 @@ export default function HostPage() {
           
           {/* Controls */}
           <div className="space-y-6">
-            {gameMode === 'buzzer' ? <BuzzerPanel /> : <HostPanel />}
+                {gameMode === 'buzzer' ? <BuzzerPanel gameId={gameId} /> : <HostPanel />}
             
             {/* Scoreboard */}
             <Card>
