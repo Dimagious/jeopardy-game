@@ -1,6 +1,14 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
 test.describe('Export Functionality', () => {
+  // Helper функция для выбора режима игры
+  const selectGameMode = async (page: Page, mode: 'jeopardy' | 'buzzer' = 'jeopardy') => {
+    const buttonText = mode === 'jeopardy' ? 'Выбрать Классический Jeopardy' : 'Выбрать Buzzer Mode'
+    await expect(page.getByRole('button', { name: buttonText })).toBeVisible()
+    await page.getByRole('button', { name: buttonText }).click()
+    await page.waitForTimeout(500) // Даем время на переход
+  }
+
   test.beforeEach(async ({ page }) => {
     // Переходим на страницу пульта ведущего
     await page.goto('/host/demo-game')
@@ -13,6 +21,9 @@ test.describe('Export Functionality', () => {
       await page.getByRole('button', { name: 'Новая игра' }).click()
       await page.waitForTimeout(500) // Даем время на закрытие модального окна
     }
+    
+    // Выбираем режим игры (по умолчанию Jeopardy)
+    await selectGameMode(page, 'jeopardy')
   })
 
   test('should export results to CSV after answering questions', async ({ page }) => {
