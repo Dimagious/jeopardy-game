@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react'
+import { memo, useState } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useGameStore } from '../shared/gameStore'
 import { useSessionStore } from '../shared/sessionStore'
@@ -24,9 +24,7 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
   const {
     currentSession,
     createSession,
-    stopSession,
-    getPlayersCount,
-    addPlayer
+    stopSession
   } = useSessionStore()
 
   const [buzzWinner, setBuzzWinner] = useState<string | null>(null)
