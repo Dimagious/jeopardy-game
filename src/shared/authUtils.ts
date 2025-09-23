@@ -1,5 +1,8 @@
 import { RolePermissions } from './types'
 
+// Экспортируем тип для использования в других файлах
+export type { RolePermissions }
+
 // Роли и их права доступа
 export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   Owner: {
