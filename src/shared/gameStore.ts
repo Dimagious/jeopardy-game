@@ -132,16 +132,18 @@ const forceSyncToScreen = (getState: () => GameStore) => {
       version: Date.now()
     }
     
-    // Принудительно обновляем localStorage
-    localStorage.setItem('jeopardy-game-store', JSON.stringify(storeData))
-    
-    // Отправляем событие storage для синхронизации экрана
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'jeopardy-game-store',
-      newValue: JSON.stringify(storeData),
-      oldValue: localStorage.getItem('jeopardy-game-store'),
-      storageArea: localStorage
-    }))
+    // Принудительно обновляем localStorage (только в браузере)
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('jeopardy-game-store', JSON.stringify(storeData))
+      
+      // Отправляем событие storage для синхронизации экрана
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'jeopardy-game-store',
+        newValue: JSON.stringify(storeData),
+        oldValue: localStorage.getItem('jeopardy-game-store'),
+        storageArea: localStorage
+      }))
+    }
   }, 50)
 }
 
