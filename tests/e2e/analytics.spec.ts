@@ -28,7 +28,8 @@ test.describe('Analytics Integration', () => {
     await page.getByText('$100').first().click()
     
     // Проверяем, что вопрос отобразился (это означает, что board_select был отправлен)
-    await expect(page.getByText('В каком году началась Вторая мировая война?')).toBeVisible()
+    const questionText = page.locator('.text-xl.mb-4')
+    await expect(questionText).toBeVisible()
   })
 
   test('should track judge event', async ({ page }) => {

@@ -78,7 +78,7 @@ test.describe('Jeopardy Game Flow', () => {
     await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     
     // Проверяем, что команда выбрана (подсветка)
-    const teamButton = page.getByRole('button', { name: 'Команда 1 $' })
+    const teamButton = page.getByRole('button', { name: 'Команда 1 0$' })
     await expect(teamButton).toHaveClass(/border-yellow-400/)
     
     // Проверяем, что кнопки судейства активны
