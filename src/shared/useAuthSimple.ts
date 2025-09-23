@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { User as SupabaseUser, Session } from '@supabase/supabase-js'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
-import { AuthState, AuthUser, Organization, Membership } from './types'
+import { AuthState, AuthUser, Organization } from './types'
 import { hasPermission } from './authUtils'
 
 export function useAuth() {
@@ -174,7 +174,7 @@ export function useAuth() {
 
   // Проверка прав доступа
   const checkPermission = useCallback((permission: string) => {
-    return hasPermission(authState.currentRole, permission as any)
+    return hasPermission(authState.currentRole, permission as keyof typeof import('./authUtils').ROLE_PERMISSIONS)
   }, [authState.currentRole])
 
   return {

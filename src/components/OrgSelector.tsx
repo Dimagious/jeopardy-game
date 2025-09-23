@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Organization } from '../shared/types'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui'
+import { Button } from '../ui'
 
 interface OrgSelectorProps {
   organizations: Organization[]

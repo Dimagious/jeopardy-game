@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui'
 import { analytics } from '../shared/analytics'
 import { useAuth } from '../shared/useAuthSimple'
@@ -9,7 +8,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const navigate = useNavigate()
   const { signInWithEmail } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
