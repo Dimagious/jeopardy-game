@@ -76,7 +76,6 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
   const handleStopSession = () => {
     if (currentSession) {
       stopSession(currentSession.id)
-      setBuzzWinner(null)
       setBuzzTimer(null)
       console.log('Session stopped')
     }
