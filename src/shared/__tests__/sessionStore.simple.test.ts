@@ -504,10 +504,10 @@ describe('sessionUtils', () => {
         useSessionStore.getState().assignPlayerToTeam(session.id, player2.id, teamId2)
         
         const assignments = useSessionStore.getState().getTeamAssignments(session.id)
-        expect(assignments[teamId1]).toHaveLength(1)
-        expect(assignments[teamId2]).toHaveLength(1)
-        expect(assignments[teamId1][0].id).toBe(player1.id)
-        expect(assignments[teamId2][0].id).toBe(player2.id)
+        expect(assignments[teamId1]!).toHaveLength(1)
+        expect(assignments[teamId2]!).toHaveLength(1)
+        expect(assignments[teamId1]![0]!.id).toBe(player1.id)
+        expect(assignments[teamId2]![0]!.id).toBe(player2.id)
       })
     })
 
@@ -518,7 +518,7 @@ describe('sessionUtils', () => {
         
         const unassignedPlayers = useSessionStore.getState().getUnassignedPlayers(session.id)
         expect(unassignedPlayers).toHaveLength(1)
-        expect(unassignedPlayers[0].id).toBe(player2.id)
+        expect(unassignedPlayers[0]!.id).toBe(player2.id)
       })
     })
 

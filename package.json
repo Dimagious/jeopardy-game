@@ -16,7 +16,8 @@
     "e2e": "playwright test",
     "prepare": "husky install",
     "tree": "tree -L 3 -I 'node_modules'",
-    "precommit": "npm run lint && npm run typecheck && npm run test && npm run e2e"
+    "precommit": "npm run lint && npm run typecheck && npm run test && npm run e2e",
+    "ci:local": "npm ci && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "@sentry/react": "^10.13.0",
