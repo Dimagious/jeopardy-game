@@ -10,6 +10,8 @@ const ScreenPage = lazy(() => import('./pages/ScreenPage'))
 const PackManager = lazy(() => import('./pages/PackManager'))
 const PlayerPage = lazy(() => import('./pages/PlayerPage'))
 const PinRedirectPage = lazy(() => import('./pages/PinRedirectPage'))
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 // Loading component for lazy routes
 const PageLoader = () => (
@@ -25,6 +27,22 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route 
+            path="/auth/callback" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AuthCallbackPage />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AdminPage />
+              </Suspense>
+            } 
+          />
           <Route 
             path="/host/:gameId" 
             element={

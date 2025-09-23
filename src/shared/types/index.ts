@@ -76,13 +76,18 @@ export interface User {
   id: string
   email: string
   name?: string
+  avatarUrl?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Organization {
   id: string
   name: string
+  description?: string
   createdBy: string
   createdAt: string
+  updatedAt: string
 }
 
 export interface Membership {
@@ -90,6 +95,37 @@ export interface Membership {
   orgId: string
   role: 'Owner' | 'Admin' | 'Host' | 'Viewer'
   createdAt: string
+  updatedAt: string
+}
+
+// Auth types
+export interface AuthUser {
+  id: string
+  email: string
+  name?: string
+  avatarUrl?: string
+  organizations: Organization[]
+  currentOrg?: Organization
+  currentRole?: 'Owner' | 'Admin' | 'Host' | 'Viewer'
+}
+
+export interface AuthState {
+  user: AuthUser | null
+  isLoading: boolean
+  isAuthenticated: boolean
+  currentOrg: Organization | null
+  currentRole: 'Owner' | 'Admin' | 'Host' | 'Viewer' | null
+}
+
+// Role permissions
+export interface RolePermissions {
+  canManageUsers: boolean
+  canManageGames: boolean
+  canManagePacks: boolean
+  canManageBilling: boolean
+  canViewAnalytics: boolean
+  canHostGames: boolean
+  canViewScreen: boolean
 }
 
 // Plan types
