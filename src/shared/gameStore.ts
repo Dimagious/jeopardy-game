@@ -111,6 +111,38 @@ interface GameStore {
   restoreGameSnapshot: (snapshot: GameSnapshot) => void
   clearGame: () => void
   createAutoSnapshot: () => void
+  
+  // Управление состоянием
+  resetCurrentQuestion: () => void
+}
+
+// Функция для принудительной синхронизации с экраном
+const forceSyncToScreen = (getState: () => GameState) => {
+  setTimeout(() => {
+    const currentState = getState()
+    const storeData = {
+      state: {
+        game: currentState.game,
+        categories: currentState.categories,
+        questions: currentState.questions,
+        teams: currentState.teams,
+        scoreEvents: currentState.scoreEvents,
+        gameState: currentState.gameState,
+      },
+      version: Date.now()
+    }
+    
+    // Принудительно обновляем localStorage
+    localStorage.setItem('jeopardy-game-store', JSON.stringify(storeData))
+    
+    // Отправляем событие storage для синхронизации экрана
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'jeopardy-game-store',
+      newValue: JSON.stringify(storeData),
+      oldValue: localStorage.getItem('jeopardy-game-store'),
+      storageArea: localStorage
+    }))
+  }, 50)
 }
 
 // Локальная шина событий (мок Realtime)
@@ -208,6 +240,9 @@ export const useGameStore = create<GameStore>()(
 
         set({ gameState: newGameState })
 
+        // Принудительно синхронизируем с экраном
+        forceSyncToScreen(get)
+
         // Создаем автоснапшот
         get().createAutoSnapshot()
 
@@ -238,6 +273,9 @@ export const useGameStore = create<GameStore>()(
         }
 
         set({ gameState: newGameState })
+
+        // Принудительно синхронизируем с экраном
+        forceSyncToScreen(get)
 
         // Публикуем событие
         const event = createGameEvent.answerToggle(
@@ -420,6 +458,21 @@ export const useGameStore = create<GameStore>()(
           scoreEvents: [],
           gameState: null,
         })
+      },
+
+      // Сброс текущего вопроса (возврат к полю)
+      resetCurrentQuestion: () => {
+        set((state) => ({
+          gameState: state.gameState ? {
+            ...state.gameState,
+            currentQuestion: null,
+            selectedTeam: '',
+            showAnswer: false,
+          } : null
+        }))
+        
+        // Принудительно синхронизируем с экраном
+        forceSyncToScreen(get)
       },
 
       // Автоснапшоты

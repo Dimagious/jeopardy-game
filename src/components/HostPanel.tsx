@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useGameStore } from '../shared/gameStore'
 import { cn } from '../shared/utils'
@@ -7,7 +7,7 @@ interface HostPanelProps {
   className?: string
 }
 
-export default function HostPanel({ className }: HostPanelProps) {
+const HostPanel = memo(function HostPanel({ className }: HostPanelProps) {
   const {
     gameState,
     teams,
@@ -16,6 +16,7 @@ export default function HostPanel({ className }: HostPanelProps) {
     judgeAnswer,
     getTeamScore,
     exportResults,
+    resetCurrentQuestion,
   } = useGameStore()
 
   const selectedTeam = gameState?.selectedTeam
@@ -44,9 +45,9 @@ export default function HostPanel({ className }: HostPanelProps) {
           break
         case 'escape':
           e.preventDefault()
-          // Сброс выбора команды
-          if (selectedTeam) {
-            selectTeam('')
+          // Возврат к полю - сброс текущего вопроса
+          if (gameState.currentQuestion) {
+            resetCurrentQuestion()
           }
           break
       }
@@ -54,7 +55,7 @@ export default function HostPanel({ className }: HostPanelProps) {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [gameState, selectedTeam, toggleAnswer, judgeAnswer, selectTeam])
+  }, [gameState, selectedTeam, toggleAnswer, judgeAnswer, selectTeam, resetCurrentQuestion])
 
   const handleTeamSelect = (teamId: string) => {
     selectTeam(teamId)
@@ -87,9 +88,9 @@ export default function HostPanel({ className }: HostPanelProps) {
           {gameState?.currentQuestion ? (
             <div className="space-y-4 animate-fade-in">
               <div className="jeopardy-question min-h-[200px] flex flex-col justify-center animate-scale-in glow-effect">
-                <div className="text-lg font-semibold mb-2 text-shadow animate-slide-up">
-                  ${gameState.currentQuestion.value}
-                </div>
+              <div className="text-lg font-semibold mb-2 text-shadow animate-slide-up">
+                {gameState.currentQuestion.value}$
+              </div>
                 <div className="text-xl mb-4 text-shadow animate-slide-up">
                   {gameState.currentQuestion.text}
                 </div>
@@ -103,11 +104,21 @@ export default function HostPanel({ className }: HostPanelProps) {
                 )}
               </div>
               
-              <div className="text-sm text-gray-400">
-                Горячие клавиши: <kbd className="px-2 py-1 bg-gray-700 rounded">A</kbd> - ответ,{' '}
-                <kbd className="px-2 py-1 bg-gray-700 rounded">C</kbd> - верно,{' '}
-                <kbd className="px-2 py-1 bg-gray-700 rounded">X</kbd> - неверно,{' '}
-                <kbd className="px-2 py-1 bg-gray-700 rounded">Esc</kbd> - назад
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-400">
+                  Горячие клавиши: <kbd className="px-2 py-1 bg-gray-700 rounded">A</kbd> - ответ,{' '}
+                  <kbd className="px-2 py-1 bg-gray-700 rounded">C</kbd> - верно,{' '}
+                  <kbd className="px-2 py-1 bg-gray-700 rounded">X</kbd> - неверно,{' '}
+                  <kbd className="px-2 py-1 bg-gray-700 rounded">Esc</kbd> - назад
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={resetCurrentQuestion}
+                  >
+                    ← Назад к полю
+                  </Button>
+                </div>
               </div>
             </div>
           ) : (
@@ -188,7 +199,7 @@ export default function HostPanel({ className }: HostPanelProps) {
                     <span className="font-medium">{team.name}</span>
                   </div>
                   <span className="font-bold text-jeopardy-gold">
-                    ${score}
+                    {score}$
                   </span>
                 </button>
               )
@@ -217,4 +228,6 @@ export default function HostPanel({ className }: HostPanelProps) {
       </Card>
     </div>
   )
-}
+})
+
+export default HostPanel
