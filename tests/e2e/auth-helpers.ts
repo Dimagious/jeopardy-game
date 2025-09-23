@@ -5,6 +5,34 @@ import { Page, expect } from '@playwright/test'
  * Работает с новой системой аутентификации через Supabase Magic Link
  */
 
+// Типизация для мока Supabase в тестах
+interface MockUser {
+  id: string
+  email: string
+  user_metadata: {
+    name?: string
+  }
+}
+
+interface MockSession {
+  user: MockUser
+}
+
+interface MockSupabaseAuth {
+  getSession: () => Promise<{ data: { session: MockSession } | null; error: null }>
+  onAuthStateChange: (callback: (event: string, session: MockSession) => void) => { data: { subscription: { unsubscribe: () => void } } }
+}
+
+interface MockSupabase {
+  auth: MockSupabaseAuth
+}
+
+declare global {
+  interface Window {
+    supabase?: MockSupabase
+  }
+}
+
 export interface TestUser {
   email: string
   name?: string
