@@ -15,7 +15,7 @@ export default function Scoreboard({ className, variant = 'host' }: ScoreboardPr
     <div className={cn('w-full animate-fade-in', className)}>
       <h2 className={cn(
         'font-bold mb-6 text-center text-shadow animate-slide-up',
-        isScreen ? 'screen-text-xl' : 'text-xl'
+        isScreen ? 'text-xl' : 'text-xl'
       )}>
         Счёт команд
       </h2>
@@ -49,16 +49,16 @@ export default function Scoreboard({ className, variant = 'host' }: ScoreboardPr
                 )}></div>
                 <div className={cn(
                   'font-semibold text-shadow',
-                  isScreen ? 'screen-text-lg' : 'text-base'
+                  isScreen ? 'text-lg' : 'text-base'
                 )}>
                   {team.name}
                 </div>
               </div>
               <div className={cn(
                 'font-bold text-jeopardy-gold text-shadow-lg transition-all duration-300',
-                isScreen ? 'screen-text-2xl' : 'text-xl'
+                isScreen ? 'text-2xl' : 'text-xl'
               )}>
-                ${score}
+                {score}$
               </div>
             </div>
           )
