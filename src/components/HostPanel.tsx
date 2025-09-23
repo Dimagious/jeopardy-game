@@ -11,6 +11,7 @@ const HostPanel = memo(function HostPanel({ className }: HostPanelProps) {
   const {
     gameState,
     teams,
+    gameMode,
     selectTeam,
     toggleAnswer,
     judgeAnswer,
@@ -82,7 +83,19 @@ const HostPanel = memo(function HostPanel({ className }: HostPanelProps) {
       {/* Отображение текущего вопроса */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Вопрос</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Вопрос</CardTitle>
+            {gameMode && (
+              <div className={cn(
+                "px-3 py-1 rounded-full text-sm font-medium",
+                gameMode === 'jeopardy' 
+                  ? "bg-blue-600 text-blue-100" 
+                  : "bg-green-600 text-green-100"
+              )}>
+                {gameMode === 'jeopardy' ? '🎯 Jeopardy' : '⚡ Buzzer'}
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {gameState?.currentQuestion ? (

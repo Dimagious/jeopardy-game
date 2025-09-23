@@ -10,12 +10,24 @@ export type AnalyticsEvent =
   | 'host_page_view'
   | 'screen_page_view'
   | 'export_results'
+  | 'session_start'
+  | 'session_stop'
+  | 'player_joined'
+  | 'player_left'
+  | 'pin_page_view'
+  | 'player_page_view'
+  | 'player_assigned_to_team'
+  | 'player_removed_from_team'
+  | 'team_assignment_changed'
 
 interface AnalyticsEventData {
   gameId?: string
   questionId?: string
   teamId?: string
   playerId?: string
+  sessionId?: string
+  pin?: string
+  playerName?: string
   correct?: boolean
   delta?: number
   eventCount?: number
@@ -60,9 +72,6 @@ class Analytics {
     this.track('judge', { gameId, questionId, teamId, correct, delta })
   }
 
-  buzzFirst(gameId: string, playerId: string) {
-    this.track('buzz_first', { gameId, playerId })
-  }
 
   login() {
     this.track('login')
@@ -78,6 +87,48 @@ class Analytics {
 
   exportResults(gameId: string, eventCount: number) {
     this.track('export_results', { gameId, eventCount })
+  }
+
+  // Session and player events
+  sessionStart(gameId: string, sessionId: string, pin: string) {
+    this.track('session_start', { gameId, sessionId, pin })
+  }
+
+  sessionStop(gameId: string, sessionId: string) {
+    this.track('session_stop', { gameId, sessionId })
+  }
+
+  playerJoined(sessionId: string, playerId: string, playerName: string) {
+    this.track('player_joined', { sessionId, playerId, playerName })
+  }
+
+  playerLeft(sessionId: string, playerId: string) {
+    this.track('player_left', { sessionId, playerId })
+  }
+
+  pinPageView(pin: string) {
+    this.track('pin_page_view', { pin })
+  }
+
+  playerPageView(sessionId: string) {
+    this.track('player_page_view', { sessionId })
+  }
+
+  buzzFirst(sessionId: string, playerId: string, playerName: string) {
+    this.track('buzz_first', { sessionId, playerId, playerName })
+  }
+
+  // Team assignment analytics
+  playerAssignedToTeam(sessionId: string, playerId: string, playerName: string, teamId: string, teamName: string) {
+    this.track('player_assigned_to_team', { sessionId, playerId, playerName, teamId, teamName })
+  }
+
+  playerRemovedFromTeam(sessionId: string, playerId: string, playerName: string, teamId: string, teamName: string) {
+    this.track('player_removed_from_team', { sessionId, playerId, playerName, teamId, teamName })
+  }
+
+  teamAssignmentChanged(sessionId: string, teamId: string, teamName: string, playerCount: number) {
+    this.track('team_assignment_changed', { sessionId, teamId, teamName, playerCount })
   }
 }
 

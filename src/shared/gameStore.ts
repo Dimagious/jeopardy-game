@@ -77,6 +77,9 @@ const DEMO_GAME: Game = {
   createdAt: new Date().toISOString(),
 }
 
+// Типы режимов игры
+export type GameMode = 'jeopardy' | 'buzzer'
+
 // Интерфейс для локального хранилища игры
 interface GameStore {
   // Данные игры
@@ -89,6 +92,9 @@ interface GameStore {
   // Состояние игры
   gameState: GameState | null
   
+  // Режим игры
+  gameMode: GameMode | null
+  
   // Действия
   initializeGame: (gameId: string) => void
   selectQuestion: (questionId: string) => void
@@ -97,6 +103,15 @@ interface GameStore {
   selectTeam: (teamId: string) => void
   resetGame: () => void
   exportResults: () => void
+  
+  // Управление режимами
+  setGameMode: (mode: GameMode) => void
+  getGameMode: (gameId: string) => GameMode | null
+  
+  // Управление командами игроков (для Buzzer Mode)
+  getPlayersByTeam: (teamId: string) => unknown[]
+  getTeamPlayerCount: (teamId: string) => number
+  getPlayerTeamScore: (teamId: string) => number
   
   // Утилиты
   getQuestionById: (id: string) => Question | undefined
@@ -193,6 +208,7 @@ export const useGameStore = create<GameStore>()(
       teams: [],
       scoreEvents: [],
       gameState: null,
+      gameMode: null,
 
       // Инициализация игры
       initializeGame: (gameId: string) => {
@@ -498,6 +514,51 @@ export const useGameStore = create<GameStore>()(
           // eventBus.publish(createGameEvent('GAME_SNAPSHOT', { snapshot }))
         }
       },
+
+      // Управление режимами
+      setGameMode: (mode: GameMode) => {
+        set({ gameMode: mode })
+        
+        // Принудительно синхронизируем с экраном
+        forceSyncToScreen(get)
+      },
+
+      getGameMode: (gameId: string) => {
+        // Сначала проверяем store
+        const currentMode = get().gameMode
+        if (currentMode) {
+          return currentMode
+        }
+
+        // Затем проверяем localStorage
+        const storedMode = localStorage.getItem(`jeopardy-game-mode-${gameId}`)
+        if (storedMode && (storedMode === 'jeopardy' || storedMode === 'buzzer')) {
+          set({ gameMode: storedMode as GameMode })
+          return storedMode as GameMode
+        }
+
+        return null
+      },
+
+      // Управление командами игроков (для Buzzer Mode)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getPlayersByTeam: (_teamId: string) => {
+        // Эта функция будет интегрирована с sessionStore
+        // Пока возвращаем пустой массив
+        return []
+      },
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getTeamPlayerCount: (_teamId: string) => {
+        // Эта функция будет интегрирована с sessionStore
+        // Пока возвращаем 0
+        return 0
+      },
+
+      getPlayerTeamScore: (teamId: string) => {
+        // Возвращаем очки команды (уже реализовано в getTeamScore)
+        return get().getTeamScore(teamId)
+      },
     }),
     {
       name: 'jeopardy-game-store',
@@ -508,6 +569,7 @@ export const useGameStore = create<GameStore>()(
         teams: state.teams,
         scoreEvents: state.scoreEvents,
         gameState: state.gameState,
+        gameMode: state.gameMode,
       }),
     }
   )

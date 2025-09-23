@@ -8,6 +8,8 @@ import './App.css'
 const HostPage = lazy(() => import('./pages/HostPage'))
 const ScreenPage = lazy(() => import('./pages/ScreenPage'))
 const PackManager = lazy(() => import('./pages/PackManager'))
+const PlayerPage = lazy(() => import('./pages/PlayerPage'))
+const PinRedirectPage = lazy(() => import('./pages/PinRedirectPage'))
 
 // Loading component for lazy routes
 const PageLoader = () => (
@@ -32,6 +34,14 @@ function App() {
             } 
           />
           <Route 
+            path="/host/:gameId/:mode" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <HostPage />
+              </Suspense>
+            } 
+          />
+          <Route 
             path="/screen/:gameId" 
             element={
               <Suspense fallback={<PageLoader />}>
@@ -44,6 +54,22 @@ function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <PackManager />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/p/:pin" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PinRedirectPage />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/player/:sessionId" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PlayerPage />
               </Suspense>
             } 
           />

@@ -2,24 +2,44 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { Board, HostPanel, Scoreboard } from '../components'
+import BuzzerPanel from '../components/BuzzerPanel'
 import GameRestoreModal from '../components/GameRestoreModal'
-import { useGameStore } from '../shared/gameStore'
+import GameModeSelector from '../components/GameModeSelector'
+import { useGameStore, GameMode } from '../shared/gameStore'
 import { analytics } from '../shared/analytics'
 
 export default function HostPage() {
-  const { gameId } = useParams<{ gameId: string }>()
+  const { gameId, mode } = useParams<{ gameId: string; mode?: string }>()
   const { 
     initializeGame, 
     hasActiveGame, 
     clearGame, 
-    createAutoSnapshot 
+    createAutoSnapshot,
+    getGameMode,
+    setGameMode,
+    gameMode
   } = useGameStore()
   const [showRestoreModal, setShowRestoreModal] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [showModeSelector, setShowModeSelector] = useState(false)
 
   useEffect(() => {
     if (gameId && !isInitialized) {
       analytics.hostPageView(gameId)
+      
+      // Проверяем режим игры
+      const currentMode = getGameMode(gameId)
+      
+      // Если режим не выбран, показываем селектор
+      if (!currentMode && !mode) {
+        setShowModeSelector(true)
+        return
+      }
+      
+      // Если режим выбран в URL, устанавливаем его
+      if (mode && (mode === 'jeopardy' || mode === 'buzzer')) {
+        setGameMode(mode as GameMode)
+      }
       
       // Проверяем, есть ли активная игра
       if (hasActiveGame()) {
@@ -29,7 +49,7 @@ export default function HostPage() {
         setIsInitialized(true)
       }
     }
-  }, [gameId, initializeGame, hasActiveGame, isInitialized])
+  }, [gameId, mode, initializeGame, hasActiveGame, isInitialized, getGameMode, setGameMode])
 
   // Автоснапшоты каждые 10 секунд
   useEffect(() => {
@@ -56,6 +76,22 @@ export default function HostPage() {
     setIsInitialized(true)
   }
 
+  const handleModeSelect = (selectedMode: GameMode) => {
+    setGameMode(selectedMode)
+    setShowModeSelector(false)
+    
+    // Инициализируем игру после выбора режима
+    if (gameId) {
+      initializeGame(gameId)
+      setIsInitialized(true)
+    }
+  }
+
+  // Показываем селектор режимов
+  if (showModeSelector && gameId) {
+    return <GameModeSelector gameId={gameId} onModeSelect={handleModeSelect} />
+  }
+
   return (
     <div className="min-h-screen bg-jeopardy-dark text-white p-6">
       <div className="max-w-7xl mx-auto">
@@ -77,9 +113,9 @@ export default function HostPage() {
             </Card>
           </div>
           
-          {/* Controls */}
-          <div className="space-y-6">
-            <HostPanel />
+              {/* Controls */}
+              <div className="space-y-6">
+                {gameMode === 'buzzer' && gameId ? <BuzzerPanel gameId={gameId} /> : <HostPanel />}
             
             {/* Scoreboard */}
             <Card>
