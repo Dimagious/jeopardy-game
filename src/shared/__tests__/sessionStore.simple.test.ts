@@ -308,4 +308,126 @@ describe('sessionUtils', () => {
       expect(sessionUtils.getPlayerSessionUrl('session-123')).toBe('/player/session-123')
     })
   })
+
+  // Buzz функциональность тесты
+  describe('Buzz functionality', () => {
+    let session: { id: string; gameId: string; pin: string; isActive: boolean; createdAt: string; players: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }[]; buzzState: { isLocked: boolean; winner: { id: string; name: string } | null; lockExpiresAt: number | null; events: { id: string; sessionId: string; playerId: string; timestamp: number; isWinner: boolean }[] } }
+    let player1: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }
+    let player2: { id: string; sessionId: string; name: string; joinedAt: string; isActive: boolean }
+
+    beforeEach(() => {
+      const gameId = 'test-game-buzz'
+      session = useSessionStore.getState().createSession(gameId)
+      player1 = useSessionStore.getState().addPlayer(session.id, 'Player 1')
+      player2 = useSessionStore.getState().addPlayer(session.id, 'Player 2')
+    })
+
+    describe('buzzPlayer', () => {
+      it('should create buzz event for first player', () => {
+        const buzzEvent = useSessionStore.getState().buzzPlayer(session.id, player1.id)
+        
+        expect(buzzEvent).toBeTruthy()
+        expect(buzzEvent?.playerId).toBe(player1.id)
+        expect(buzzEvent?.isWinner).toBe(true)
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.isLocked).toBe(true)
+        expect(buzzState?.winner?.id).toBe(player1.id)
+      })
+
+      it('should ignore buzz when already locked', () => {
+        // Первый buzz
+        useSessionStore.getState().buzzPlayer(session.id, player1.id)
+        
+        // Второй buzz должен быть проигнорирован
+        const buzzEvent2 = useSessionStore.getState().buzzPlayer(session.id, player2.id)
+        expect(buzzEvent2).toBeNull()
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.winner?.id).toBe(player1.id) // Первый игрок остается победителем
+      })
+
+      it('should return null for non-existent session', () => {
+        const buzzEvent = useSessionStore.getState().buzzPlayer('non-existent', player1.id)
+        expect(buzzEvent).toBeNull()
+      })
+
+      it('should return null for non-existent player', () => {
+        const buzzEvent = useSessionStore.getState().buzzPlayer(session.id, 'non-existent')
+        expect(buzzEvent).toBeNull()
+      })
+    })
+
+    describe('lockBuzz', () => {
+      it('should lock buzz for specific player', () => {
+        useSessionStore.getState().lockBuzz(session.id, player1.id, 5000)
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.isLocked).toBe(true)
+        expect(buzzState?.winner?.id).toBe(player1.id)
+        expect(buzzState?.lockExpiresAt).toBeGreaterThan(Date.now())
+      })
+
+      it('should use default duration of 3000ms', () => {
+        useSessionStore.getState().lockBuzz(session.id, player1.id)
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.lockExpiresAt).toBeGreaterThan(Date.now() + 2000)
+        expect(buzzState?.lockExpiresAt).toBeLessThan(Date.now() + 4000)
+      })
+    })
+
+    describe('unlockBuzz', () => {
+      it('should unlock buzz', () => {
+        useSessionStore.getState().lockBuzz(session.id, player1.id)
+        useSessionStore.getState().unlockBuzz(session.id)
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.isLocked).toBe(false)
+        expect(buzzState?.lockExpiresAt).toBeNull()
+      })
+    })
+
+    describe('getBuzzWinner', () => {
+      it('should return buzz winner', () => {
+        useSessionStore.getState().buzzPlayer(session.id, player1.id)
+        
+        const winner = useSessionStore.getState().getBuzzWinner(session.id)
+        expect(winner?.id).toBe(player1.id)
+        expect(winner?.name).toBe('Player 1')
+      })
+
+      it('should return null when no buzz winner', () => {
+        const winner = useSessionStore.getState().getBuzzWinner(session.id)
+        expect(winner).toBeNull()
+      })
+    })
+
+    describe('getBuzzState', () => {
+      it('should return buzz state', () => {
+        const initialState = useSessionStore.getState().getBuzzState(session.id)
+        expect(initialState?.isLocked).toBe(false)
+        expect(initialState?.winner).toBeNull()
+        expect(initialState?.events).toEqual([])
+      })
+
+      it('should return null for non-existent session', () => {
+        const state = useSessionStore.getState().getBuzzState('non-existent')
+        expect(state).toBeNull()
+      })
+    })
+
+    describe('resetBuzz', () => {
+      it('should reset buzz state', () => {
+        useSessionStore.getState().buzzPlayer(session.id, player1.id)
+        useSessionStore.getState().resetBuzz(session.id)
+        
+        const buzzState = useSessionStore.getState().getBuzzState(session.id)
+        expect(buzzState?.isLocked).toBe(false)
+        expect(buzzState?.winner).toBeNull()
+        expect(buzzState?.lockExpiresAt).toBeNull()
+        expect(buzzState?.events).toEqual([])
+      })
+    })
+  })
 })

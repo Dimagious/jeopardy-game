@@ -4,11 +4,12 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useSessionStore, sessionUtils } from '../shared/sessionStore'
 import { useGameStore } from '../shared/gameStore'
 import { analytics } from '../shared/analytics'
+import { cn } from '../shared/utils'
 
 export default function PlayerPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
-  const { getSessionById, addPlayer, getPlayersCount } = useSessionStore()
+  const { getSessionById, addPlayer, getPlayersCount, buzzPlayer, getBuzzState } = useSessionStore()
   const { gameState, getQuestionById, getCategoryById } = useGameStore()
   
   const [playerName, setPlayerName] = useState('')
@@ -16,6 +17,7 @@ export default function PlayerPage() {
   const [currentPlayer, setCurrentPlayer] = useState<{ id: string; name: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [buzzState, setBuzzState] = useState<{ isLocked: boolean; winner: { id: string; name: string } | null; lockExpiresAt: number | null } | null>(null)
 
   const session = sessionId ? getSessionById(sessionId) : null
 
@@ -24,6 +26,14 @@ export default function PlayerPage() {
       analytics.playerPageView(sessionId)
     }
   }, [sessionId])
+
+  // Отслеживание buzz состояния
+  useEffect(() => {
+    if (sessionId) {
+      const state = getBuzzState(sessionId)
+      setBuzzState(state)
+    }
+  }, [sessionId, getBuzzState])
 
   const handleJoinSession = async () => {
     if (!sessionId || !playerName.trim()) {
@@ -69,6 +79,18 @@ export default function PlayerPage() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isLoading) {
       handleJoinSession()
+    }
+  }
+
+  const handleBuzz = () => {
+    if (!sessionId || !currentPlayer) return
+
+    const buzzEvent = buzzPlayer(sessionId, currentPlayer.id)
+    if (buzzEvent) {
+      analytics.buzzFirst(sessionId, currentPlayer.id, currentPlayer.name)
+      // Обновляем buzz состояние
+      const state = getBuzzState(sessionId)
+      setBuzzState(state)
     }
   }
 
@@ -231,16 +253,29 @@ export default function PlayerPage() {
             </CardHeader>
             <CardContent className="text-center">
               <Button
-                className="w-full h-20 text-2xl font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                onClick={() => {
-                  // TODO: Реализовать buzz функциональность в US-102
-                  console.log('Buzz!', currentPlayer?.id)
-                }}
+                className={cn(
+                  "w-full h-20 text-2xl font-bold text-white shadow-lg transition-all duration-200",
+                  buzzState?.isLocked
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700 hover:shadow-xl transform hover:scale-105"
+                )}
+                onClick={handleBuzz}
+                disabled={buzzState?.isLocked}
               >
-                🚨 Я ПЕРВЫЙ! 🚨
+                {buzzState?.isLocked && buzzState?.winner?.id === currentPlayer?.id
+                  ? "🎉 ВЫ ПЕРВЫЕ! 🎉"
+                  : buzzState?.isLocked
+                  ? "⏳ ЗАБЛОКИРОВАНО ⏳"
+                  : "🚨 Я ПЕРВЫЙ! 🚨"
+                }
               </Button>
               <p className="text-sm text-gray-400 mt-2">
-                Нажмите, когда будете готовы отвечать на вопрос
+                {buzzState?.isLocked && buzzState?.winner?.id === currentPlayer?.id
+                  ? "Ожидайте решения ведущего"
+                  : buzzState?.isLocked
+                  ? "Кто-то уже нажал первым"
+                  : "Нажмите, когда будете готовы отвечать на вопрос"
+                }
               </p>
             </CardContent>
           </Card>
