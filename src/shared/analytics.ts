@@ -69,9 +69,6 @@ class Analytics {
     this.track('judge', { gameId, questionId, teamId, correct, delta })
   }
 
-  buzzFirst(gameId: string, playerId: string) {
-    this.track('buzz_first', { gameId, playerId })
-  }
 
   login() {
     this.track('login')
@@ -112,6 +109,10 @@ class Analytics {
 
   playerPageView(sessionId: string) {
     this.track('player_page_view', { sessionId })
+  }
+
+  buzzFirst(sessionId: string, playerId: string, playerName: string) {
+    this.track('buzz_first', { sessionId, playerId, playerName })
   }
 }
 

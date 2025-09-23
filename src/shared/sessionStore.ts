@@ -11,6 +11,22 @@ export interface Player {
   isActive: boolean
 }
 
+// Buzz события
+export interface BuzzEvent {
+  id: string
+  sessionId: string
+  playerId: string
+  timestamp: number
+  isWinner: boolean
+}
+
+export interface BuzzState {
+  isLocked: boolean
+  winner: Player | null
+  lockExpiresAt: number | null
+  events: BuzzEvent[]
+}
+
 export interface Session {
   id: string
   gameId: string
@@ -19,6 +35,7 @@ export interface Session {
   createdAt: string
   players: Player[]
   maxPlayers?: number
+  buzzState: BuzzState
 }
 
 export interface SessionStore {
@@ -37,6 +54,14 @@ export interface SessionStore {
   removePlayer: (sessionId: string, playerId: string) => void
   updatePlayer: (sessionId: string, playerId: string, updates: Partial<Player>) => void
   assignPlayerToTeam: (sessionId: string, playerId: string, teamId: string) => void
+  
+  // Buzz функциональность
+  buzzPlayer: (sessionId: string, playerId: string) => BuzzEvent | null
+  lockBuzz: (sessionId: string, playerId: string, duration?: number) => void
+  unlockBuzz: (sessionId: string) => void
+  getBuzzWinner: (sessionId: string) => Player | null
+  getBuzzState: (sessionId: string) => BuzzState | null
+  resetBuzz: (sessionId: string) => void
   
   // Утилиты
   generatePin: () => string
@@ -70,6 +95,12 @@ export const useSessionStore = create<SessionStore>()(
           isActive: true,
           createdAt: new Date().toISOString(),
           players: [],
+          buzzState: {
+            isLocked: false,
+            winner: null,
+            lockExpiresAt: null,
+            events: []
+          },
           ...(maxPlayers !== undefined && { maxPlayers })
         }
 
@@ -218,6 +249,167 @@ export const useSessionStore = create<SessionStore>()(
             localStorage.removeItem(key)
           }
         })
+      },
+
+      // Buzz функциональность
+      buzzPlayer: (sessionId: string, playerId: string) => {
+        const session = get().getSessionById(sessionId)
+        if (!session || !session.isActive) {
+          return null
+        }
+
+        // Если buzz уже заблокирован, игнорируем
+        if (session.buzzState.isLocked) {
+          return null
+        }
+
+        const player = session.players.find(p => p.id === playerId)
+        if (!player || !player.isActive) {
+          return null
+        }
+
+        const buzzEvent: BuzzEvent = {
+          id: `buzz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          sessionId,
+          playerId,
+          timestamp: Date.now(),
+          isWinner: true
+        }
+
+        // Блокируем buzz на 3 секунды
+        const lockExpiresAt = Date.now() + 3000
+
+        set((state) => ({
+          sessions: state.sessions.map(s =>
+            s.id === sessionId
+              ? {
+                  ...s,
+                  buzzState: {
+                    isLocked: true,
+                    winner: player,
+                    lockExpiresAt,
+                    events: [...s.buzzState.events, buzzEvent]
+                  }
+                }
+              : s
+          ),
+          currentSession: state.currentSession?.id === sessionId
+            ? {
+                ...state.currentSession,
+                buzzState: {
+                  isLocked: true,
+                  winner: player,
+                  lockExpiresAt,
+                  events: [...state.currentSession.buzzState.events, buzzEvent]
+                }
+              }
+            : state.currentSession
+        }))
+
+        return buzzEvent
+      },
+
+      lockBuzz: (sessionId: string, playerId: string, duration: number = 3000) => {
+        const session = get().getSessionById(sessionId)
+        if (!session) return
+
+        const player = session.players.find(p => p.id === playerId)
+        if (!player) return
+
+        const lockExpiresAt = Date.now() + duration
+
+        set((state) => ({
+          sessions: state.sessions.map(s =>
+            s.id === sessionId
+              ? {
+                  ...s,
+                  buzzState: {
+                    ...s.buzzState,
+                    isLocked: true,
+                    winner: player,
+                    lockExpiresAt
+                  }
+                }
+              : s
+          ),
+          currentSession: state.currentSession?.id === sessionId
+            ? {
+                ...state.currentSession,
+                buzzState: {
+                  ...state.currentSession.buzzState,
+                  isLocked: true,
+                  winner: player,
+                  lockExpiresAt
+                }
+              }
+            : state.currentSession
+        }))
+      },
+
+      unlockBuzz: (sessionId: string) => {
+        set((state) => ({
+          sessions: state.sessions.map(s =>
+            s.id === sessionId
+              ? {
+                  ...s,
+                  buzzState: {
+                    ...s.buzzState,
+                    isLocked: false,
+                    lockExpiresAt: null
+                  }
+                }
+              : s
+          ),
+          currentSession: state.currentSession?.id === sessionId
+            ? {
+                ...state.currentSession,
+                buzzState: {
+                  ...state.currentSession.buzzState,
+                  isLocked: false,
+                  lockExpiresAt: null
+                }
+              }
+            : state.currentSession
+        }))
+      },
+
+      getBuzzWinner: (sessionId: string) => {
+        const session = get().getSessionById(sessionId)
+        return session?.buzzState.winner || null
+      },
+
+      getBuzzState: (sessionId: string) => {
+        const session = get().getSessionById(sessionId)
+        return session?.buzzState || null
+      },
+
+      resetBuzz: (sessionId: string) => {
+        set((state) => ({
+          sessions: state.sessions.map(s =>
+            s.id === sessionId
+              ? {
+                  ...s,
+                  buzzState: {
+                    isLocked: false,
+                    winner: null,
+                    lockExpiresAt: null,
+                    events: []
+                  }
+                }
+              : s
+          ),
+          currentSession: state.currentSession?.id === sessionId
+            ? {
+                ...state.currentSession,
+                buzzState: {
+                  isLocked: false,
+                  winner: null,
+                  lockExpiresAt: null,
+                  events: []
+                }
+              }
+            : state.currentSession
+        }))
       }
     }),
     {

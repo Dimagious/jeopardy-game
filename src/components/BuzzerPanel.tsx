@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useGameStore } from '../shared/gameStore'
 import { useSessionStore } from '../shared/sessionStore'
@@ -24,13 +24,42 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
   const {
     currentSession,
     createSession,
-    stopSession
+    stopSession,
+    getBuzzState,
+    unlockBuzz,
+    resetBuzz
   } = useSessionStore()
 
-  const [buzzWinner, setBuzzWinner] = useState<string | null>(null)
   const [buzzTimer, setBuzzTimer] = useState<number | null>(null)
 
   const selectedTeam = gameState?.selectedTeam
+
+  // Отслеживание buzz состояния
+  useEffect(() => {
+    if (currentSession) {
+      const buzzState = getBuzzState(currentSession.id)
+      if (buzzState?.isLocked && buzzState?.lockExpiresAt) {
+        const timeLeft = Math.max(0, buzzState.lockExpiresAt - Date.now())
+        if (timeLeft > 0) {
+          setBuzzTimer(Math.ceil(timeLeft / 1000))
+          
+          const timer = setInterval(() => {
+            const newTimeLeft = Math.max(0, buzzState.lockExpiresAt! - Date.now())
+            if (newTimeLeft > 0) {
+              setBuzzTimer(Math.ceil(newTimeLeft / 1000))
+            } else {
+              setBuzzTimer(null)
+              clearInterval(timer)
+            }
+          }, 1000)
+          
+          return () => clearInterval(timer)
+        }
+      } else {
+        setBuzzTimer(null)
+      }
+    }
+  }, [currentSession, getBuzzState])
 
   // Запуск сессии
   const startSession = () => {
@@ -54,29 +83,6 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
   }
 
   // Демо-функциональность отключена - только реальные игроки
-
-  // Симуляция buzz события (для демо)
-  const simulateBuzz = () => {
-    if (currentSession && currentSession.players.length > 0 && !buzzWinner) {
-      const winner = currentSession.players[Math.floor(Math.random() * currentSession.players.length)]
-      if (winner) {
-        setBuzzWinner(winner.name)
-        setBuzzTimer(3) // 3 секунды на ответ
-      }
-      
-      // Таймер обратного отсчета
-      const timer = setInterval(() => {
-        setBuzzTimer(prev => {
-          if (prev && prev > 1) {
-            return prev - 1
-          } else {
-            clearInterval(timer)
-            return null
-          }
-        })
-      }, 1000)
-    }
-  }
 
   return (
     <div className={className}>
@@ -165,48 +171,60 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
             <CardTitle>Жужалка</CardTitle>
           </CardHeader>
           <CardContent>
-            {buzzWinner ? (
-              <div className="text-center space-y-4">
-                <div className="text-2xl font-bold text-yellow-400">
-                  🏆 Первый: {buzzWinner}
-                </div>
-                {buzzTimer && (
-                  <div className="text-lg text-gray-300">
-                    Время на ответ: {buzzTimer}с
+            {(() => {
+              const buzzState = currentSession ? getBuzzState(currentSession.id) : null
+              const buzzWinner = buzzState?.winner
+              
+              if (buzzWinner) {
+                return (
+                  <div className="text-center space-y-4">
+                    <div className="text-2xl font-bold text-yellow-400">
+                      🏆 Первый: {buzzWinner.name}
+                    </div>
+                    {buzzTimer && (
+                      <div className="text-lg text-gray-300">
+                        Время на ответ: {buzzTimer}с
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => {
+                          if (currentSession) {
+                            unlockBuzz(currentSession.id)
+                          }
+                        }}
+                        variant="secondary"
+                        className="flex-1"
+                      >
+                        Сбросить buzz
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          if (currentSession) {
+                            resetBuzz(currentSession.id)
+                            resetCurrentQuestion()
+                          }
+                        }}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        Следующий вопрос
+                      </Button>
+                    </div>
                   </div>
-                )}
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => setBuzzWinner(null)}
-                    variant="secondary"
-                    className="flex-1"
-                  >
-                    Сбросить
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      setBuzzWinner(null)
-                      setBuzzTimer(null)
-                    }}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    Следующий вопрос
-                  </Button>
+                )
+              }
+              
+              return (
+                <div className="text-center">
+                  <p className="text-gray-400 mb-4">
+                    Ожидание buzz от игроков...
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Игроки нажимают кнопку "Я первый" на своих устройствах
+                  </p>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <Button 
-                  onClick={simulateBuzz}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-lg py-4"
-                >
-                  🎯 Симулировать buzz (тест)
-                </Button>
-                <p className="text-sm text-gray-400 mt-2">
-                  Только для тестирования. В реальной игре игроки нажимают кнопку на своих устройствах
-                </p>
-              </div>
-            )}
+              )
+            })()}
           </CardContent>
         </Card>
       )}
