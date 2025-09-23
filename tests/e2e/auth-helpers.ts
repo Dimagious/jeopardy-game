@@ -91,7 +91,7 @@ async function mockSuccessfulAuth(page: Page, user: TestUser) {
           },
           error: null
         }),
-        onAuthStateChange: (callback: any) => {
+        onAuthStateChange: (callback: (event: string, session: MockSession) => void) => {
           // Симулируем успешную авторизацию
           setTimeout(() => {
             callback('SIGNED_IN', {

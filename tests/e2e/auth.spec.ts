@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { loginTestUser, logout, TEST_USER } from './auth-helpers'
 
 test.describe('Authentication Flow', () => {

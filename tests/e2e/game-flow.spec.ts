@@ -1,5 +1,5 @@
-import { test, expect, Page } from '@playwright/test'
-import { setupGameTest, loginTestUser, navigateToGame, selectGameMode } from './auth-helpers'
+import { test, expect } from '@playwright/test'
+import { setupGameTest } from './auth-helpers'
 
 test.describe('Jeopardy Game Flow', () => {
   test.beforeEach(async ({ page }) => {
