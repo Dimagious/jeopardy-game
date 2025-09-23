@@ -372,21 +372,75 @@ CREATE POLICY "Users can view audit logs in their orgs" ON audit_logs
     )
   );
 
--- Создаем индексы для производительности
-CREATE INDEX idx_memberships_user_id ON memberships(user_id);
-CREATE INDEX idx_memberships_org_id ON memberships(org_id);
-CREATE INDEX idx_games_org_id ON games(org_id);
-CREATE INDEX idx_games_created_by ON games(created_by);
-CREATE INDEX idx_teams_game_id ON teams(game_id);
-CREATE INDEX idx_categories_game_id ON categories(game_id);
-CREATE INDEX idx_questions_category_id ON questions(category_id);
-CREATE INDEX idx_score_events_game_id ON score_events(game_id);
-CREATE INDEX idx_sessions_org_id ON sessions(org_id);
-CREATE INDEX idx_sessions_pin ON sessions(pin);
-CREATE INDEX idx_players_session_id ON players(session_id);
-CREATE INDEX idx_buzz_events_session_id ON buzz_events(session_id);
-CREATE INDEX idx_answer_submissions_session_id ON answer_submissions(session_id);
-CREATE INDEX idx_question_packs_org_id ON question_packs(org_id);
-CREATE INDEX idx_pack_categories_pack_id ON pack_categories(pack_id);
-CREATE INDEX idx_pack_questions_pack_category_id ON pack_questions(pack_category_id);
-CREATE INDEX idx_audit_logs_table_record ON audit_logs(table_name, record_id);
+-- Создаем индексы для производительности (с проверкой существования)
+DO $$ 
+BEGIN
+    -- Создаем индексы только если они не существуют
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_memberships_user_id') THEN
+        CREATE INDEX idx_memberships_user_id ON memberships(user_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_memberships_org_id') THEN
+        CREATE INDEX idx_memberships_org_id ON memberships(org_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_games_org_id') THEN
+        CREATE INDEX idx_games_org_id ON games(org_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_games_created_by') THEN
+        CREATE INDEX idx_games_created_by ON games(created_by);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_teams_game_id') THEN
+        CREATE INDEX idx_teams_game_id ON teams(game_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_categories_game_id') THEN
+        CREATE INDEX idx_categories_game_id ON categories(game_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_questions_category_id') THEN
+        CREATE INDEX idx_questions_category_id ON questions(category_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_score_events_game_id') THEN
+        CREATE INDEX idx_score_events_game_id ON score_events(game_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_sessions_org_id') THEN
+        CREATE INDEX idx_sessions_org_id ON sessions(org_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_sessions_pin') THEN
+        CREATE INDEX idx_sessions_pin ON sessions(pin);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_players_session_id') THEN
+        CREATE INDEX idx_players_session_id ON players(session_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_buzz_events_session_id') THEN
+        CREATE INDEX idx_buzz_events_session_id ON buzz_events(session_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_answer_submissions_session_id') THEN
+        CREATE INDEX idx_answer_submissions_session_id ON answer_submissions(session_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_question_packs_org_id') THEN
+        CREATE INDEX idx_question_packs_org_id ON question_packs(org_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_pack_categories_pack_id') THEN
+        CREATE INDEX idx_pack_categories_pack_id ON pack_categories(pack_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_pack_questions_pack_category_id') THEN
+        CREATE INDEX idx_pack_questions_pack_category_id ON pack_questions(pack_category_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_audit_logs_table_record') THEN
+        CREATE INDEX idx_audit_logs_table_record ON audit_logs(table_name, record_id);
+    END IF;
+END $$;

@@ -3,15 +3,18 @@
 -- Создаем тестовые планы
 INSERT INTO plans (id, name, caps) VALUES 
 ('free', 'Free Plan', '{"maxGames": 3, "maxTeams": 4, "maxGridRows": 5, "maxGridCols": 5, "branding": false}'),
-('pro', 'Pro Plan', '{"maxGames": 20, "maxTeams": 8, "maxGridRows": 6, "maxGridCols": 6, "branding": true}');
+('pro', 'Pro Plan', '{"maxGames": 20, "maxTeams": 8, "maxGridRows": 6, "maxGridCols": 6, "branding": true}')
+ON CONFLICT (id) DO NOTHING;
 
--- Создаем тестовую организацию (будет создана после регистрации первого пользователя)
--- INSERT INTO orgs (id, name, description, created_by, created_at, updated_at) VALUES 
--- ('550e8400-e29b-41d4-a716-446655440000', 'Demo Organization', 'Тестовая организация для демонстрации', '00000000-0000-0000-0000-000000000000', NOW(), NOW());
+-- Создаем тестовую организацию
+INSERT INTO orgs (id, name, description, created_by, created_at, updated_at) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'Demo Organization', 'Тестовая организация для демонстрации', '00000000-0000-0000-0000-000000000000', NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
 
 -- Создаем тестовый пакет вопросов
 INSERT INTO question_packs (id, org_id, title, description, is_public, tags, created_by, created_at, updated_at) VALUES 
-('550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', 'Демо пакет вопросов', 'Тестовый пакет для демонстрации функциональности', true, ARRAY['demo', 'test'], '00000000-0000-0000-0000-000000000000', NOW(), NOW());
+('550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', 'Демо пакет вопросов', 'Тестовый пакет для демонстрации функциональности', true, ARRAY['demo', 'test'], '00000000-0000-0000-0000-000000000000', NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
 
 -- Создаем категории для демо пакета
 INSERT INTO pack_categories (id, pack_id, name, color, "order") VALUES 
@@ -19,7 +22,8 @@ INSERT INTO pack_categories (id, pack_id, name, color, "order") VALUES
 ('550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440001', 'Наука', '#10B981', 2),
 ('550e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440001', 'Спорт', '#F59E0B', 3),
 ('550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440001', 'Кино', '#EF4444', 4),
-('550e8400-e29b-41d4-a716-446655440006', '550e8400-e29b-41d4-a716-446655440001', 'География', '#8B5CF6', 5);
+('550e8400-e29b-41d4-a716-446655440006', '550e8400-e29b-41d4-a716-446655440001', 'География', '#8B5CF6', 5)
+ON CONFLICT (id) DO NOTHING;
 
 -- Создаем вопросы для демо пакета
 INSERT INTO pack_questions (id, pack_category_id, value, text, answer, "order") VALUES 
@@ -56,4 +60,5 @@ INSERT INTO pack_questions (id, pack_category_id, value, text, answer, "order") 
 ('550e8400-e29b-41d4-a716-446655440028', '550e8400-e29b-41d4-a716-446655440006', 200, 'В какой стране находится Эйфелева башня?', 'Франция', 2),
 ('550e8400-e29b-41d4-a716-446655440029', '550e8400-e29b-41d4-a716-446655440006', 300, 'Какая река самая длинная в мире?', 'Нил', 3),
 ('550e8400-e29b-41d4-a716-446655440030', '550e8400-e29b-41d4-a716-446655440006', 400, 'В каком океане находится Марианская впадина?', 'Тихий', 4),
-('550e8400-e29b-41d4-a716-446655440031', '550e8400-e29b-41d4-a716-446655440006', 500, 'Какая столица Австралии?', 'Канберра', 5);
+('550e8400-e29b-41d4-a716-446655440031', '550e8400-e29b-41d4-a716-446655440006', 500, 'Какая столица Австралии?', 'Канберра', 5)
+ON CONFLICT (id) DO NOTHING;
