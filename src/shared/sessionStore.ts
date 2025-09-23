@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { buzzRateLimiter } from './rateLimiter'
+import { sessionValidator } from './sessionValidator'
 
 // Типы для сессий и игроков
 export interface Player {
@@ -265,6 +267,33 @@ export const useSessionStore = create<SessionStore>()(
           return null
         }
 
+        // Валидация сессии и игрока
+        const sessionValidation = sessionValidator.validateSession(session)
+        if (!sessionValidation.valid) {
+          console.warn('Session validation failed:', sessionValidation.error)
+          return null
+        }
+
+        const playerValidation = sessionValidator.validatePlayer(session, playerId)
+        if (!playerValidation.valid) {
+          console.warn('Player validation failed:', playerValidation.error)
+          return null
+        }
+
+        // Rate limiting проверка
+        const rateLimitResult = buzzRateLimiter.checkLimit(playerId)
+        if (!rateLimitResult.allowed) {
+          console.warn('Rate limit exceeded for player:', playerId)
+          return null
+        }
+
+        // Проверка подозрительной активности
+        const suspiciousActivity = sessionValidator.detectSuspiciousActivity(session, playerId)
+        if (!suspiciousActivity.valid) {
+          console.warn('Suspicious activity detected:', suspiciousActivity.error)
+          return null
+        }
+
         // Если buzz уже заблокирован, игнорируем
         if (session.buzzState.isLocked) {
           return null
@@ -281,6 +310,13 @@ export const useSessionStore = create<SessionStore>()(
           playerId,
           timestamp: Date.now(),
           isWinner: true
+        }
+
+        // Валидация buzz события
+        const buzzValidation = sessionValidator.validateBuzzEvent(session, playerId, buzzEvent)
+        if (!buzzValidation.valid) {
+          console.warn('Buzz event validation failed:', buzzValidation.error)
+          return null
         }
 
         // Блокируем buzz на 3 секунды

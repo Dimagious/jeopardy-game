@@ -4,6 +4,7 @@ import { useGameStore } from '../shared/gameStore'
 import { useSessionStore } from '../shared/sessionStore'
 import { analytics } from '../shared/analytics'
 import { cn } from '../shared/utils'
+// import { buzzDebouncer } from '../shared/rateLimiter' // Пока не используется
 
 interface BuzzerPanelProps {
   className?: string
