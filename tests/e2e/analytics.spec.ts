@@ -34,7 +34,7 @@ test.describe('Analytics Integration', () => {
   test('should track judge event', async ({ page }) => {
     // Выбираем вопрос и команду
     await page.getByText('$100').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     
     // Засчитываем ответ
     await page.getByRole('button', { name: 'Верно', exact: true }).click()

@@ -22,7 +22,7 @@ test.describe('Export Functionality', () => {
     // Отвечаем на несколько вопросов
     // Первый вопрос - правильный ответ
     await page.getByText('$100').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Второй вопрос - неправильный ответ
@@ -32,7 +32,7 @@ test.describe('Export Functionality', () => {
     
     // Третий вопрос - правильный ответ
     await page.getByText('$300').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Проверяем, что очки обновились (используем более простые селекторы)
@@ -77,7 +77,7 @@ test.describe('Export Functionality', () => {
   test('should export correct data format', async ({ page }) => {
     // Отвечаем на один вопрос
     await page.getByText('$100').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Настраиваем перехват скачивания файла

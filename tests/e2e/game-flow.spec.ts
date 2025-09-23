@@ -74,7 +74,7 @@ test.describe('Jeopardy Game Flow', () => {
     await page.getByText('$100').first().click()
     
     // Выбираем команду
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     
     // Проверяем, что команда выбрана (подсветка)
     const teamButton = page.getByRole('button', { name: 'Команда 1 $' })
@@ -100,7 +100,7 @@ test.describe('Jeopardy Game Flow', () => {
     await page.getByText('$100').first().click()
     
     // Выбираем команду
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     
     // Тестируем горячую клавишу A (показать ответ)
     await page.keyboard.press('KeyA')
@@ -135,7 +135,7 @@ test.describe('Jeopardy Game Flow', () => {
     // await expect(screenPage.getByText('1939')).toBeVisible()
     
     // Засчитываем ответ
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Проверяем, что очки обновились на экране
@@ -149,9 +149,9 @@ test.describe('Jeopardy Game Flow', () => {
 
   test('should display scoreboard correctly', async ({ page }) => {
     // Проверяем начальные очки (используем role button для scoreboard)
-    await expect(page.getByRole('button', { name: 'Команда 1 $' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Команда 2 $' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Команда 3 $' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Команда 1 0$' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Команда 2 0$' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Команда 3 0$' })).toBeVisible()
     
     // Проверяем цветовые индикаторы
     const team1Indicator = page.locator('.bg-red-500').first()
@@ -170,7 +170,7 @@ test.describe('Jeopardy Game Flow', () => {
   test('should handle multiple questions and scoring', async ({ page }) => {
     // Отвечаем на первый вопрос правильно
     await page.getByText('$100').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Проверяем очки (используем более специфичный селектор для очков)
@@ -178,7 +178,7 @@ test.describe('Jeopardy Game Flow', () => {
     
     // Отвечаем на второй вопрос неправильно
     await page.getByText('$200').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Неверно', exact: true }).click()
     
     // Проверяем, что очки уменьшились (используем более специфичный селектор)
@@ -196,7 +196,7 @@ test.describe('Jeopardy Game Flow', () => {
   test('should prevent selecting completed questions', async ({ page }) => {
     // Отвечаем на вопрос
     await page.getByText('$100').first().click()
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Пытаемся выбрать тот же вопрос снова
@@ -228,7 +228,7 @@ test.describe('Jeopardy Game Flow', () => {
     // await expect(screenPage.getByText('В каком году началась Вторая мировая война?')).toBeVisible()
     
     // Засчитываем ответ
-    await page.getByRole('button', { name: 'Команда 1 $' }).click()
+    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Проверяем, что на экране снова отображается игровое поле
