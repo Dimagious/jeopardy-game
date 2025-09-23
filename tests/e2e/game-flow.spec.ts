@@ -179,7 +179,10 @@ test.describe('Jeopardy Game Flow', () => {
     
     // Отвечаем на второй вопрос неправильно
     await page.getByText('$200').first().click()
-    await page.getByRole('button', { name: 'Команда 1 0$' }).click()
+    await page.getByRole('button', { name: 'Команда 1 100$' }).click()
+    
+    // Ждем, пока кнопки судейства станут активными
+    await expect(page.getByRole('button', { name: 'Неверно', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Неверно', exact: true }).click()
     
     // Проверяем, что очки уменьшились (используем более специфичный селектор)

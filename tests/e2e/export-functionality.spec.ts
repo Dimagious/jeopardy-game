@@ -28,6 +28,9 @@ test.describe('Export Functionality', () => {
     // Второй вопрос - неправильный ответ
     await page.getByText('$200').first().click()
     await page.getByRole('button', { name: 'Команда 2 0$' }).click()
+    
+    // Ждем, пока кнопки судейства станут активными
+    await expect(page.getByRole('button', { name: 'Неверно', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Неверно', exact: true }).click()
     
     // Третий вопрос - правильный ответ
