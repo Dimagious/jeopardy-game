@@ -468,8 +468,8 @@ export const useGameStore = create<GameStore>()(
           gameState: state.gameState ? {
             ...state.gameState,
             currentQuestion: null,
-            selectedTeam: '',
-            showAnswer: false,
+            selectedTeam: null,
+            isQuestionOpen: false,
           } : null
         }))
         

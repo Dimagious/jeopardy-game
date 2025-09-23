@@ -26,7 +26,13 @@ test.describe('Export Functionality', () => {
     await page.getByRole('button', { name: 'Верно', exact: true }).click()
     
     // Второй вопрос - неправильный ответ
-    await page.getByText('$200').first().click()
+    // Выбираем новый вопрос в другой категории
+    await page.getByText('$200').nth(1).click()
+    
+    // Сначала показываем ответ
+    await page.getByRole('button', { name: 'Показать ответ' }).click()
+    
+    // Затем выбираем команду
     await page.getByRole('button', { name: 'Команда 2 0$' }).click()
     
     // Ждем, пока кнопки судейства станут активными

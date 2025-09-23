@@ -178,7 +178,13 @@ test.describe('Jeopardy Game Flow', () => {
     await expect(page.locator('.font-bold.text-jeopardy-gold').first()).toBeVisible()
     
     // Отвечаем на второй вопрос неправильно
-    await page.getByText('$200').first().click()
+    // Выбираем новый вопрос (второй в той же категории)
+    await page.getByText('$200').nth(1).click()
+    
+    // Сначала показываем ответ
+    await page.getByRole('button', { name: 'Показать ответ' }).click()
+    
+    // Затем выбираем команду
     await page.getByRole('button', { name: 'Команда 1 100$' }).click()
     
     // Ждем, пока кнопки судейства станут активными
