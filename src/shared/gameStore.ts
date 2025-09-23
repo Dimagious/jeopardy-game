@@ -117,7 +117,7 @@ interface GameStore {
 }
 
 // Функция для принудительной синхронизации с экраном
-const forceSyncToScreen = (getState: () => GameState) => {
+const forceSyncToScreen = (getState: () => GameStore) => {
   setTimeout(() => {
     const currentState = getState()
     const storeData = {
