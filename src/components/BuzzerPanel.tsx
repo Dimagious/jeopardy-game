@@ -1,7 +1,8 @@
-import { memo, useState, useEffect } from 'react'
+import { memo, useState, useEffect, useCallback } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui'
 import { useGameStore } from '../shared/gameStore'
 import { useSessionStore } from '../shared/sessionStore'
+import { analytics } from '../shared/analytics'
 import { cn } from '../shared/utils'
 
 interface BuzzerPanelProps {
@@ -27,10 +28,16 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
     stopSession,
     getBuzzState,
     unlockBuzz,
-    resetBuzz
+    resetBuzz,
+    assignPlayerToTeam,
+    removePlayerFromTeam,
+    getPlayersByTeam,
+    getUnassignedPlayers,
+    getPlayerTeam
   } = useSessionStore()
 
   const [buzzTimer, setBuzzTimer] = useState<number | null>(null)
+  const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null)
 
   const selectedTeam = gameState?.selectedTeam
 
@@ -82,6 +89,60 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
   }
 
   // Демо-функциональность отключена - только реальные игроки
+
+  // Drag'n'drop функции
+  const handleDragStart = useCallback((playerId: string) => {
+    setDraggedPlayer(playerId)
+  }, [])
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedPlayer(null)
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent, teamId: string) => {
+    e.preventDefault()
+    if (draggedPlayer && currentSession) {
+      const player = currentSession.players.find(p => p.id === draggedPlayer)
+      const team = teams.find(t => t.id === teamId)
+      
+      if (player && team) {
+        assignPlayerToTeam(currentSession.id, draggedPlayer, teamId)
+        analytics.playerAssignedToTeam(
+          currentSession.id,
+          player.id,
+          player.name,
+          teamId,
+          team.name
+        )
+      }
+    }
+    setDraggedPlayer(null)
+  }, [draggedPlayer, currentSession, assignPlayerToTeam, teams])
+
+  const handleRemoveFromTeam = useCallback((playerId: string) => {
+    if (currentSession) {
+      const player = currentSession.players.find(p => p.id === playerId)
+      const currentTeamId = getPlayerTeam(currentSession.id, playerId)
+      
+      if (player && currentTeamId) {
+        const team = teams.find(t => t.id === currentTeamId)
+        if (team) {
+          removePlayerFromTeam(currentSession.id, playerId)
+          analytics.playerRemovedFromTeam(
+            currentSession.id,
+            player.id,
+            player.name,
+            currentTeamId,
+            team.name
+          )
+        }
+      }
+    }
+  }, [currentSession, removePlayerFromTeam, getPlayerTeam, teams])
 
   return (
     <div className={className}>
@@ -159,6 +220,90 @@ const BuzzerPanel = memo(function BuzzerPanel({ className, gameId }: BuzzerPanel
                 </p>
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Управление командами */}
+      {currentSession?.isActive && currentSession.players.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Распределение по командам</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Команды */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teams.map((team) => {
+                  const teamPlayers = currentSession ? getPlayersByTeam(currentSession.id, team.id) : []
+                  return (
+                    <div
+                      key={team.id}
+                      className={cn(
+                        "p-4 rounded-lg border-2 border-dashed transition-colors",
+                        "bg-gray-800 border-gray-600 hover:border-blue-500"
+                      )}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, team.id)}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-white">{team.name}</h3>
+                        <span className="text-sm text-gray-400">{teamPlayers.length} игроков</span>
+                      </div>
+                      
+                      <div className="space-y-2 min-h-[100px]">
+                        {teamPlayers.map((player) => (
+                          <div
+                            key={player.id}
+                            className="flex items-center justify-between p-2 bg-gray-700 rounded"
+                          >
+                            <span className="text-white">{player.name}</span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleRemoveFromTeam(player.id)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        ))}
+                        
+                        {teamPlayers.length === 0 && (
+                          <div className="text-center text-gray-500 py-4">
+                            Перетащите игроков сюда
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Неназначенные игроки */}
+              {currentSession && getUnassignedPlayers(currentSession.id).length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-white mb-3">Неназначенные игроки</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {getUnassignedPlayers(currentSession.id).map((player) => (
+                      <div
+                        key={player.id}
+                        draggable
+                        onDragStart={() => handleDragStart(player.id)}
+                        onDragEnd={handleDragEnd}
+                        className={cn(
+                          "p-3 bg-gray-700 rounded cursor-move transition-all",
+                          "hover:bg-gray-600 hover:shadow-md",
+                          draggedPlayer === player.id && "opacity-50"
+                        )}
+                      >
+                        <span className="text-white">{player.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

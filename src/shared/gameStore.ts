@@ -108,6 +108,11 @@ interface GameStore {
   setGameMode: (mode: GameMode) => void
   getGameMode: (gameId: string) => GameMode | null
   
+  // Управление командами игроков (для Buzzer Mode)
+  getPlayersByTeam: (teamId: string) => unknown[]
+  getTeamPlayerCount: (teamId: string) => number
+  getPlayerTeamScore: (teamId: string) => number
+  
   // Утилиты
   getQuestionById: (id: string) => Question | undefined
   getCategoryById: (id: string) => Category | undefined
@@ -533,6 +538,26 @@ export const useGameStore = create<GameStore>()(
         }
 
         return null
+      },
+
+      // Управление командами игроков (для Buzzer Mode)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getPlayersByTeam: (_teamId: string) => {
+        // Эта функция будет интегрирована с sessionStore
+        // Пока возвращаем пустой массив
+        return []
+      },
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getTeamPlayerCount: (_teamId: string) => {
+        // Эта функция будет интегрирована с sessionStore
+        // Пока возвращаем 0
+        return 0
+      },
+
+      getPlayerTeamScore: (teamId: string) => {
+        // Возвращаем очки команды (уже реализовано в getTeamScore)
+        return get().getTeamScore(teamId)
       },
     }),
     {
