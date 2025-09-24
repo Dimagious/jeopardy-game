@@ -132,6 +132,39 @@ export interface GameContentSummary {
   isComplete: boolean
 }
 
+// Team types
+export interface Team {
+  id: string
+  gameId: string
+  name: string
+  color: string
+  order: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTeamRequest {
+  name: string
+  color: string
+  order?: number
+}
+
+export interface UpdateTeamRequest {
+  name?: string
+  color?: string
+  order?: number
+}
+
+export interface ReorderTeamsRequest {
+  teamIds: string[]
+}
+
+export interface TeamLimits {
+  current: number
+  max: number
+  canCreate: boolean
+}
+
 // Локальное состояние игры
 export interface GameState {
   gameId: string
