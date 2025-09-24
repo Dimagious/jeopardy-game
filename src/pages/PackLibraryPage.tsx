@@ -23,7 +23,7 @@ function PackLibraryPage() {
     importPackToGame
   } = usePacks(orgId || null)
 
-  const { games } = useGames()
+  const { games } = useGames(null)
   const { tags } = usePackTags(orgId || null)
 
   const [filters, setFilters] = useState<PackFilters>({})
@@ -84,7 +84,13 @@ function PackLibraryPage() {
   }
 
   const handleSearch = (search: string) => {
-    setFilters(prev => ({ ...prev, search: search || undefined }))
+    const newFilters = { ...filters }
+    if (search) {
+      newFilters.search = search
+    } else {
+      delete newFilters.search
+    }
+    setFilters(newFilters)
   }
 
   const handleTagFilter = (tag: string) => {
@@ -242,7 +248,7 @@ function PackLibraryPage() {
           onImport={handleImportPack}
           availablePacks={packs}
           availableGames={games.map(game => ({ id: game.id, title: game.title }))}
-          isLoading={isSubmitting}
+          isLoading={false}
         />
       </div>
     </div>

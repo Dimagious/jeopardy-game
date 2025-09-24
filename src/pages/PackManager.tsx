@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import PackImporter from '../components/PackImporter'
+import { PackImporter } from '../components/PackImporter'
 import PackLibrary from '../components/PackLibrary'
 import { QuestionPack } from '../shared/types/packTypes'
 
@@ -57,7 +57,14 @@ export default function PackManager() {
           {/* Левая колонка - Импорт или Библиотека */}
           <div>
             {activeTab === 'import' ? (
-              <PackImporter onPackImported={handlePackImported} />
+              <PackImporter 
+                isOpen={true}
+                onClose={() => {}}
+                onImport={(packId, gameId) => console.log('Import:', packId, gameId)}
+                availablePacks={[]}
+                availableGames={[]}
+                isLoading={false}
+              />
             ) : (
               <PackLibrary onPackSelected={handlePackSelected} />
             )}
