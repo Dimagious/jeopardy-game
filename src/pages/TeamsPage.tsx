@@ -195,7 +195,7 @@ function TeamsPage() {
             </Card>
           ) : (
             teams.map((team, index) => {
-              const teamCardProps = {
+              const baseProps = {
                 key: team.id,
                 team,
                 onEdit: () => handleEditTeam(team),
@@ -205,11 +205,10 @@ function TeamsPage() {
                 isLast: index === teams.length - 1,
               }
 
-              if (index > 0) {
-                (teamCardProps as any).onMoveUp = () => handleMoveTeam(team, 'up')
-              }
-              if (index < teams.length - 1) {
-                (teamCardProps as any).onMoveDown = () => handleMoveTeam(team, 'down')
+              const teamCardProps = {
+                ...baseProps,
+                ...(index > 0 && { onMoveUp: () => handleMoveTeam(team, 'up') }),
+                ...(index < teams.length - 1 && { onMoveDown: () => handleMoveTeam(team, 'down') }),
               }
 
               return <TeamCard {...teamCardProps} />
