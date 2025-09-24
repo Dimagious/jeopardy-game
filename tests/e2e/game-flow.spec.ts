@@ -1,29 +1,10 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { setupGameTest } from './auth-helpers'
 
 test.describe('Jeopardy Game Flow', () => {
-  // Helper функция для выбора режима игры
-  const selectGameMode = async (page: Page, mode: 'jeopardy' | 'buzzer' = 'jeopardy') => {
-    const buttonText = mode === 'jeopardy' ? 'Выбрать Классический Jeopardy' : 'Выбрать Buzzer Mode'
-    await expect(page.getByRole('button', { name: buttonText })).toBeVisible()
-    await page.getByRole('button', { name: buttonText }).click()
-    await page.waitForTimeout(500) // Даем время на переход
-  }
-
   test.beforeEach(async ({ page }) => {
-    // Переходим на страницу пульта ведущего
-    await page.goto('/host/demo-game')
-    await page.waitForLoadState('networkidle')
-    
-    // Обрабатываем модальное окно восстановления игры (если появляется)
-    const restoreModal = page.locator('[data-testid="game-restore-modal"]')
-    if (await restoreModal.isVisible()) {
-      // Выбираем "Новая игра" чтобы начать с чистого листа
-      await page.getByRole('button', { name: 'Новая игра' }).click()
-      await page.waitForTimeout(500) // Даем время на закрытие модального окна
-    }
-    
-    // Выбираем режим игры (по умолчанию Jeopardy)
-    await selectGameMode(page, 'jeopardy')
+    // Настраиваем тест с авторизацией и переходом к игре
+    await setupGameTest(page, 'demo-game', 'jeopardy')
   })
 
   test('should display game board with categories and questions', async ({ page }) => {

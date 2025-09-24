@@ -1,0 +1,203 @@
+import { useState, useEffect } from 'react'
+import { supabase } from '../shared/supabaseClient'
+import { User, Membership } from '../shared/types'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui'
+import { canManageRole, getAssignableRoles } from '../shared/authUtils'
+
+interface UserManagementProps {
+  orgId: string
+  currentUserRole: string
+  className?: string
+}
+
+export default function UserManagement({ orgId, currentUserRole, className }: UserManagementProps) {
+  const [users, setUsers] = useState<Array<User & { membership: Membership }>>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  // Загрузка пользователей организации
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        setIsLoading(true)
+        setError('')
+
+        const { data: memberships, error: membershipsError } = await supabase
+          .from('memberships')
+          .select(`
+            user_id,
+            role,
+            created_at,
+            users!inner (
+              id,
+              email,
+              name,
+              avatar_url,
+              created_at,
+              updated_at
+            )
+          `)
+          .eq('org_id', orgId)
+
+        if (membershipsError) {
+          console.error('Error loading memberships:', membershipsError)
+          setError('Ошибка при загрузке пользователей')
+          return
+        }
+
+        const usersWithMemberships = memberships?.map(membership => ({
+          id: membership.users.id,
+          email: membership.users.email,
+          name: membership.users.name,
+          avatarUrl: membership.users.avatar_url,
+          createdAt: membership.users.created_at,
+          updatedAt: membership.users.updated_at,
+          membership: {
+            userId: membership.user_id,
+            orgId,
+            role: membership.role,
+            createdAt: membership.created_at,
+            updatedAt: membership.created_at,
+          }
+        })) || []
+
+        setUsers(usersWithMemberships)
+      } catch (err) {
+        console.error('Error loading users:', err)
+        setError('Произошла ошибка при загрузке пользователей')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadUsers()
+  }, [orgId])
+
+  // Изменение роли пользователя
+  const updateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('memberships')
+        .update({ role: newRole })
+        .eq('user_id', userId)
+        .eq('org_id', orgId)
+
+      if (error) {
+        console.error('Error updating user role:', error)
+        setError('Ошибка при изменении роли')
+        return
+      }
+
+      // Обновляем локальное состояние
+      setUsers(prev => prev.map(user => 
+        user.id === userId 
+          ? { ...user, membership: { ...user.membership, role: newRole as any } }
+          : user
+      ))
+    } catch (err) {
+      console.error('Error updating user role:', err)
+      setError('Произошла ошибка при изменении роли')
+    }
+  }
+
+  // Удаление пользователя из организации
+  const removeUser = async (userId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этого пользователя из организации?')) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('memberships')
+        .delete()
+        .eq('user_id', userId)
+        .eq('org_id', orgId)
+
+      if (error) {
+        console.error('Error removing user:', error)
+        setError('Ошибка при удалении пользователя')
+        return
+      }
+
+      // Обновляем локальное состояние
+      setUsers(prev => prev.filter(user => user.id !== userId))
+    } catch (err) {
+      console.error('Error removing user:', err)
+      setError('Произошла ошибка при удалении пользователя')
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jeopardy-blue mx-auto mb-4"></div>
+            <p className="text-gray-600">Загрузка пользователей...</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Управление пользователями</CardTitle>
+        <CardDescription>
+          Управляйте ролями и доступом пользователей в организации
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {users.map((user) => (
+            <div key={user.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-jeopardy-blue rounded-full flex items-center justify-center text-white font-medium">
+                  {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div className="font-medium">{user.name || user.email}</div>
+                  <div className="text-sm text-gray-500">{user.email}</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <select
+                  value={user.membership.role}
+                  onChange={(e) => updateUserRole(user.id, e.target.value)}
+                  disabled={!canManageRole(currentUserRole, user.membership.role)}
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-jeopardy-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {getAssignableRoles(currentUserRole).map(role => (
+                    <option key={role} value={role}>
+                      {role === 'Owner' ? 'Владелец' :
+                       role === 'Admin' ? 'Администратор' :
+                       role === 'Host' ? 'Ведущий' : 'Наблюдатель'}
+                    </option>
+                  ))}
+                </select>
+                
+                {canManageRole(currentUserRole, user.membership.role) && (
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeUser(user.id)}
+                  >
+                    Удалить
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

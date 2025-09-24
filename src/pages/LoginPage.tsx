@@ -1,25 +1,33 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui'
 import { analytics } from '../shared/analytics'
+import { useAuth } from '../shared/useAuthSimple'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const { signInWithEmail } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
+    setMessage('')
     
-    // Track login event
-    analytics.login()
-    
-    // TODO: Implement Supabase auth
-    // For now, just navigate to a demo game
-    setTimeout(() => {
-      navigate('/host/demo-game')
-    }, 1000)
+    try {
+      // Track login event
+      analytics.login()
+      
+      await signInWithEmail(email)
+      setMessage('Проверьте вашу почту! Мы отправили ссылку для входа.')
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Ошибка при отправке ссылки. Попробуйте еще раз.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -47,8 +55,21 @@ export default function LoginPage() {
                 placeholder="Введите email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
+            
+            {error && (
+              <div className="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+                <p className="text-sm text-red-300">{error}</p>
+              </div>
+            )}
+            
+            {message && (
+              <div className="p-3 bg-green-900/20 border border-green-500/50 rounded-lg">
+                <p className="text-sm text-green-300">{message}</p>
+              </div>
+            )}
             
             <Button
               type="submit"
@@ -56,13 +77,13 @@ export default function LoginPage() {
               className="w-full"
               size="lg"
             >
-              {isLoading ? 'Вход...' : 'Войти'}
+              {isLoading ? 'Отправка...' : 'Получить ссылку для входа'}
             </Button>
           </form>
           
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-400">
-              Демо-режим: нажмите "Войти" для перехода к тестовой игре
+              Мы отправим ссылку для входа на ваш email
             </p>
           </div>
         </CardContent>

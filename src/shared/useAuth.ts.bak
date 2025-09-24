@@ -1,0 +1,225 @@
+import { useState, useEffect, useCallback } from 'react'
+import { User as SupabaseUser, Session } from '@supabase/supabase-js'
+import { supabase } from './supabaseClient'
+import { AuthState, AuthUser, Organization, Membership } from './types'
+import { hasPermission } from './authUtils'
+
+export function useAuth() {
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    isLoading: true,
+    isAuthenticated: false,
+    currentOrg: null,
+    currentRole: null,
+  })
+
+  // Загрузка пользователя и его организаций
+  const loadUserData = useCallback(async (supabaseUser: SupabaseUser) => {
+    try {
+      // Загружаем организации пользователя
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('memberships')
+        .select(`
+          role,
+          created_at,
+          orgs!inner (
+            id,
+            name,
+            description,
+            created_by,
+            created_at,
+            updated_at
+          )
+        `)
+        .eq('user_id', supabaseUser.id)
+
+      if (membershipsError) {
+        console.error('Error loading memberships:', membershipsError)
+        return
+      }
+
+      const organizations: Organization[] = memberships?.map(membership => ({
+        id: membership.orgs.id,
+        name: membership.orgs.name,
+        description: membership.orgs.description,
+        createdBy: membership.orgs.created_by,
+        createdAt: membership.orgs.created_at,
+        updatedAt: membership.orgs.updated_at,
+      })) || []
+
+      const authUser: AuthUser = {
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        name: supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name,
+        avatarUrl: supabaseUser.user_metadata?.avatar_url,
+        organizations,
+        currentOrg: organizations[0] || null,
+        currentRole: memberships?.[0]?.role || null,
+      }
+
+      setAuthState({
+        user: authUser,
+        isLoading: false,
+        isAuthenticated: true,
+        currentOrg: authUser.currentOrg || null,
+        currentRole: authUser.currentRole || null,
+      })
+    } catch (error) {
+      console.error('Error loading user data:', error)
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+      }))
+    }
+  }, [])
+
+  // Инициализация аутентификации
+  useEffect(() => {
+    let mounted = true
+
+    const initAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Error getting session:', error)
+          if (mounted) {
+            setAuthState(prev => ({
+              ...prev,
+              isLoading: false,
+            }))
+          }
+          return
+        }
+
+        if (session?.user && mounted) {
+          await loadUserData(session.user)
+        } else if (mounted) {
+          setAuthState({
+            user: null,
+            isLoading: false,
+            isAuthenticated: false,
+            currentOrg: null,
+            currentRole: null,
+          })
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error)
+        if (mounted) {
+          setAuthState(prev => ({
+            ...prev,
+            isLoading: false,
+          }))
+        }
+      }
+    }
+
+    initAuth()
+
+    // Слушаем изменения аутентификации
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return
+
+        if (event === 'SIGNED_IN' && session?.user) {
+          await loadUserData(session.user)
+        } else if (event === 'SIGNED_OUT') {
+          setAuthState({
+            user: null,
+            isLoading: false,
+            isAuthenticated: false,
+            currentOrg: null,
+            currentRole: null,
+          })
+        }
+      }
+    )
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [loadUserData])
+
+  // Вход через Magic Link
+  const signInWithEmail = useCallback(async (email: string) => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }))
+      
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        console.error('Error signing in:', error)
+        throw error
+      }
+
+      return { success: true }
+    } catch (error) {
+      setAuthState(prev => ({ ...prev, isLoading: false }))
+      throw error
+    }
+  }, [])
+
+  // Выход
+  const signOut = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Error signing out:', error)
+        throw error
+      }
+    } catch (error) {
+      console.error('Error signing out:', error)
+      throw error
+    }
+  }, [])
+
+  // Переключение организации
+  const switchOrganization = useCallback(async (orgId: string) => {
+    if (!authState.user) return
+
+    try {
+      // Загружаем роль пользователя в выбранной организации
+      const { data: membership, error } = await supabase
+        .from('memberships')
+        .select('role')
+        .eq('user_id', authState.user.id)
+        .eq('org_id', orgId)
+        .single()
+
+      if (error) {
+        console.error('Error loading membership:', error)
+        return
+      }
+
+      const organization = authState.user.organizations.find(org => org.id === orgId)
+      if (!organization) return
+
+      setAuthState(prev => ({
+        ...prev,
+        currentOrg: organization,
+        currentRole: membership.role,
+      }))
+    } catch (error) {
+      console.error('Error switching organization:', error)
+    }
+  }, [authState.user])
+
+  // Проверка прав доступа
+  const checkPermission = useCallback((permission: string) => {
+    return hasPermission(authState.currentRole, permission as any)
+  }, [authState.currentRole])
+
+  return {
+    ...authState,
+    signInWithEmail,
+    signOut,
+    switchOrganization,
+    hasPermission: checkPermission,
+  }
+}
