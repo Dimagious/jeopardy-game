@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { QuestionPack } from '../shared/types'
-import { Card } from '../ui/Card'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 

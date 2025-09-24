@@ -1,6 +1,5 @@
 import React from 'react'
 import { PackPreview as PackPreviewType } from '../shared/types'
-import { Card } from '../ui/Card'
 import Button from '../ui/Button'
 
 interface PackPreviewProps {

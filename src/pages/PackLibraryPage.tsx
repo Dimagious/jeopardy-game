@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../shared/useAuthSimple'
 import { usePacks, usePackTags } from '../shared/usePacks'
 import { useGames } from '../shared/useGames'
-import { QuestionPack, PackFilters, CreatePackRequest, UpdatePackRequest } from '../shared/types'
+import { QuestionPack, PackFilters } from '../shared/types'
 import Button from '../ui/Button'
 import { Card } from '../ui/Card'
 import Modal from '../ui/Modal'
@@ -18,24 +18,18 @@ function PackLibraryPage() {
     packs, 
     isLoading: packsLoading, 
     error: packsError, 
-    createPack, 
-    updatePack, 
     deletePack, 
     duplicatePack,
-    importPackToGame,
-    exportGameAsPack
+    importPackToGame
   } = usePacks(orgId || null)
 
   const { games } = useGames()
   const { tags } = usePackTags(orgId || null)
 
   const [filters, setFilters] = useState<PackFilters>({})
-  const [showPackForm, setShowPackForm] = useState(false)
   const [showPackPreview, setShowPackPreview] = useState(false)
   const [showPackImporter, setShowPackImporter] = useState(false)
-  const [editingPack, setEditingPack] = useState<QuestionPack | null>(null)
   const [previewingPack, setPreviewingPack] = useState<QuestionPack | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Проверяем права доступа
   useEffect(() => {
@@ -46,35 +40,6 @@ function PackLibraryPage() {
     }
   }, [hasPermission, navigate, authLoading])
 
-  const handleCreatePack = async (data: CreatePackRequest) => {
-    if (!orgId) return
-
-    setIsSubmitting(true)
-    try {
-      await createPack(data)
-      setShowPackForm(false)
-    } catch (err) {
-      console.error('Failed to create pack:', err)
-      alert(`Failed to create pack: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleUpdatePack = async (data: UpdatePackRequest) => {
-    if (!editingPack) return
-
-    setIsSubmitting(true)
-    try {
-      await updatePack(editingPack.id, data)
-      setEditingPack(null)
-    } catch (err) {
-      console.error('Failed to update pack:', err)
-      alert(`Failed to update pack: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   const handleDeletePack = async (pack: QuestionPack) => {
     if (window.confirm(`Are you sure you want to delete pack "${pack.title}"?`)) {
@@ -96,9 +61,6 @@ function PackLibraryPage() {
     }
   }
 
-  const handleEditPack = (pack: QuestionPack) => {
-    setEditingPack(pack)
-  }
 
   const handleViewPack = (pack: QuestionPack) => {
     setPreviewingPack(pack)
@@ -115,10 +77,6 @@ function PackLibraryPage() {
     })
   }
 
-  const handleCancelForm = () => {
-    setShowPackForm(false)
-    setEditingPack(null)
-  }
 
   const handleClosePreview = () => {
     setShowPackPreview(false)
@@ -178,7 +136,7 @@ function PackLibraryPage() {
                 Back to Admin
               </Button>
               <Button
-                onClick={() => setShowPackForm(true)}
+                onClick={() => alert('Create Pack functionality will be implemented in the next iteration')}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Create Pack
@@ -241,7 +199,7 @@ function PackLibraryPage() {
                 key={pack.id}
                 pack={pack}
                 onView={() => handleViewPack(pack)}
-                onEdit={() => handleEditPack(pack)}
+                onEdit={() => alert('Edit Pack functionality will be implemented in the next iteration')}
                 onDelete={() => handleDeletePack(pack)}
                 onDuplicate={() => handleDuplicatePack(pack)}
                 showImportButton={true}
