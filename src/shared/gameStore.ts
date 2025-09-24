@@ -18,48 +18,48 @@ interface GameSnapshot {
 
 // Демо-данные для тестирования
 const DEMO_CATEGORIES: Category[] = [
-  { id: 'cat-1', gameId: 'demo-game', name: 'История', order: 1 },
-  { id: 'cat-2', gameId: 'demo-game', name: 'Наука', order: 2 },
-  { id: 'cat-3', gameId: 'demo-game', name: 'Спорт', order: 3 },
-  { id: 'cat-4', gameId: 'demo-game', name: 'Кино', order: 4 },
-  { id: 'cat-5', gameId: 'demo-game', name: 'География', order: 5 },
+  { id: 'cat-1', gameId: 'demo-game', name: 'История', order: 1, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+  { id: 'cat-2', gameId: 'demo-game', name: 'Наука', order: 2, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+  { id: 'cat-3', gameId: 'demo-game', name: 'Спорт', order: 3, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+  { id: 'cat-4', gameId: 'demo-game', name: 'Кино', order: 4, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+  { id: 'cat-5', gameId: 'demo-game', name: 'География', order: 5, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
 ]
 
 const DEMO_QUESTIONS: Question[] = [
   // История
-  { id: 'q-1-1', categoryId: 'cat-1', value: 100, text: 'В каком году началась Вторая мировая война?', answer: '1939', order: 1, isLocked: false, isDone: false },
-  { id: 'q-1-2', categoryId: 'cat-1', value: 200, text: 'Кто был первым президентом США?', answer: 'Джордж Вашингтон', order: 2, isLocked: false, isDone: false },
-  { id: 'q-1-3', categoryId: 'cat-1', value: 300, text: 'В каком году пала Берлинская стена?', answer: '1989', order: 3, isLocked: false, isDone: false },
-  { id: 'q-1-4', categoryId: 'cat-1', value: 400, text: 'Кто написал "Войну и мир"?', answer: 'Лев Толстой', order: 4, isLocked: false, isDone: false },
-  { id: 'q-1-5', categoryId: 'cat-1', value: 500, text: 'В каком году произошла Октябрьская революция?', answer: '1917', order: 5, isLocked: false, isDone: false },
+  { id: 'q-1-1', categoryId: 'cat-1', value: 100, text: 'В каком году началась Вторая мировая война?', answer: '1939', order: 1, isLocked: false, isDone: false, createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z' },
+  { id: 'q-1-2', categoryId: 'cat-1', value: 200, text: 'Кто был первым президентом США?', answer: 'Джордж Вашингтон', order: 2, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-1-3', categoryId: 'cat-1', value: 300, text: 'В каком году пала Берлинская стена?', answer: '1989', order: 3, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-1-4', categoryId: 'cat-1', value: 400, text: 'Кто написал "Войну и мир"?', answer: 'Лев Толстой', order: 4, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-1-5', categoryId: 'cat-1', value: 500, text: 'В каком году произошла Октябрьская революция?', answer: '1917', order: 5, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
   
   // Наука
-  { id: 'q-2-1', categoryId: 'cat-2', value: 100, text: 'Какая планета ближайшая к Солнцу?', answer: 'Меркурий', order: 1, isLocked: false, isDone: false },
-  { id: 'q-2-2', categoryId: 'cat-2', value: 200, text: 'Сколько костей в теле взрослого человека?', answer: '206', order: 2, isLocked: false, isDone: false },
-  { id: 'q-2-3', categoryId: 'cat-2', value: 300, text: 'Какой газ составляет 78% атмосферы Земли?', answer: 'Азот', order: 3, isLocked: false, isDone: false },
-  { id: 'q-2-4', categoryId: 'cat-2', value: 400, text: 'Кто открыл закон всемирного тяготения?', answer: 'Исаак Ньютон', order: 4, isLocked: false, isDone: false },
-  { id: 'q-2-5', categoryId: 'cat-2', value: 500, text: 'Какой элемент имеет символ Au?', answer: 'Золото', order: 5, isLocked: false, isDone: false },
+  { id: 'q-2-1', categoryId: 'cat-2', value: 100, text: 'Какая планета ближайшая к Солнцу?', answer: 'Меркурий', order: 1, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-2-2', categoryId: 'cat-2', value: 200, text: 'Сколько костей в теле взрослого человека?', answer: '206', order: 2, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-2-3', categoryId: 'cat-2', value: 300, text: 'Какой газ составляет 78% атмосферы Земли?', answer: 'Азот', order: 3, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-2-4', categoryId: 'cat-2', value: 400, text: 'Кто открыл закон всемирного тяготения?', answer: 'Исаак Ньютон', order: 4, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-2-5', categoryId: 'cat-2', value: 500, text: 'Какой элемент имеет символ Au?', answer: 'Золото', order: 5, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
   
   // Спорт
-  { id: 'q-3-1', categoryId: 'cat-3', value: 100, text: 'В каком году проходили Олимпийские игры в Москве?', answer: '1980', order: 1, isLocked: false, isDone: false },
-  { id: 'q-3-2', categoryId: 'cat-3', value: 200, text: 'Сколько игроков в команде по футболу?', answer: '11', order: 2, isLocked: false, isDone: false },
-  { id: 'q-3-3', categoryId: 'cat-3', value: 300, text: 'Кто выиграл чемпионат мира по футболу 2018?', answer: 'Франция', order: 3, isLocked: false, isDone: false },
-  { id: 'q-3-4', categoryId: 'cat-3', value: 400, text: 'В каком виде спорта используется ракетка?', answer: 'Теннис', order: 4, isLocked: false, isDone: false },
-  { id: 'q-3-5', categoryId: 'cat-3', value: 500, text: 'Кто является рекордсменом по количеству золотых медалей Олимпиады?', answer: 'Майкл Фелпс', order: 5, isLocked: false, isDone: false },
+  { id: 'q-3-1', categoryId: 'cat-3', value: 100, text: 'В каком году проходили Олимпийские игры в Москве?', answer: '1980', order: 1, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-3-2', categoryId: 'cat-3', value: 200, text: 'Сколько игроков в команде по футболу?', answer: '11', order: 2, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-3-3', categoryId: 'cat-3', value: 300, text: 'Кто выиграл чемпионат мира по футболу 2018?', answer: 'Франция', order: 3, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-3-4', categoryId: 'cat-3', value: 400, text: 'В каком виде спорта используется ракетка?', answer: 'Теннис', order: 4, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-3-5', categoryId: 'cat-3', value: 500, text: 'Кто является рекордсменом по количеству золотых медалей Олимпиады?', answer: 'Майкл Фелпс', order: 5, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
   
   // Кино
-  { id: 'q-4-1', categoryId: 'cat-4', value: 100, text: 'Кто снял фильм "Криминальное чтиво"?', answer: 'Квентин Тарантино', order: 1, isLocked: false, isDone: false },
-  { id: 'q-4-2', categoryId: 'cat-4', value: 200, text: 'В каком году вышел фильм "Титаник"?', answer: '1997', order: 2, isLocked: false, isDone: false },
-  { id: 'q-4-3', categoryId: 'cat-4', value: 300, text: 'Кто играл главную роль в "Форресте Гампе"?', answer: 'Том Хэнкс', order: 3, isLocked: false, isDone: false },
-  { id: 'q-4-4', categoryId: 'cat-4', value: 400, text: 'Какой фильм получил Оскар за лучший фильм в 2020?', answer: 'Паразиты', order: 4, isLocked: false, isDone: false },
-  { id: 'q-4-5', categoryId: 'cat-4', value: 500, text: 'Кто режиссер фильма "Криминальное чтиво"?', answer: 'Квентин Тарантино', order: 5, isLocked: false, isDone: false },
+  { id: 'q-4-1', categoryId: 'cat-4', value: 100, text: 'Кто снял фильм "Криминальное чтиво"?', answer: 'Квентин Тарантино', order: 1, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-4-2', categoryId: 'cat-4', value: 200, text: 'В каком году вышел фильм "Титаник"?', answer: '1997', order: 2, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-4-3', categoryId: 'cat-4', value: 300, text: 'Кто играл главную роль в "Форресте Гампе"?', answer: 'Том Хэнкс', order: 3, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-4-4', categoryId: 'cat-4', value: 400, text: 'Какой фильм получил Оскар за лучший фильм в 2020?', answer: 'Паразиты', order: 4, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-4-5', categoryId: 'cat-4', value: 500, text: 'Кто режиссер фильма "Криминальное чтиво"?', answer: 'Квентин Тарантино', order: 5, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
   
   // География
-  { id: 'q-5-1', categoryId: 'cat-5', value: 100, text: 'Какая самая длинная река в мире?', answer: 'Нил', order: 1, isLocked: false, isDone: false },
-  { id: 'q-5-2', categoryId: 'cat-5', value: 200, text: 'В какой стране находится Эйфелева башня?', answer: 'Франция', order: 2, isLocked: false, isDone: false },
-  { id: 'q-5-3', categoryId: 'cat-5', value: 300, text: 'Какая столица Австралии?', answer: 'Канберра', order: 3, isLocked: false, isDone: false },
-  { id: 'q-5-4', categoryId: 'cat-5', value: 400, text: 'Сколько континентов на Земле?', answer: '7', order: 4, isLocked: false, isDone: false },
-  { id: 'q-5-5', categoryId: 'cat-5', value: 500, text: 'Какая самая высокая гора в мире?', answer: 'Эверест', order: 5, isLocked: false, isDone: false },
+  { id: 'q-5-1', categoryId: 'cat-5', value: 100, text: 'Какая самая длинная река в мире?', answer: 'Нил', order: 1, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-5-2', categoryId: 'cat-5', value: 200, text: 'В какой стране находится Эйфелева башня?', answer: 'Франция', order: 2, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-5-3', categoryId: 'cat-5', value: 300, text: 'Какая столица Австралии?', answer: 'Канберра', order: 3, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-5-4', categoryId: 'cat-5', value: 400, text: 'Сколько континентов на Земле?', answer: '7', order: 4, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'q-5-5', categoryId: 'cat-5', value: 500, text: 'Какая самая высокая гора в мире?', answer: 'Эверест', order: 5, isLocked: false, isDone: false, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
 ]
 
 const DEMO_TEAMS: Team[] = [

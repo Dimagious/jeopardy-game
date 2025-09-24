@@ -7,6 +7,27 @@ import {
   GameListResponse 
 } from './types'
 
+// Функция для маппинга данных из базы в формат TypeScript
+function mapGameFromDb(dbGame: Record<string, unknown>): Game {
+  return {
+    id: dbGame.id as string,
+    orgId: dbGame.org_id as string,
+    title: dbGame.title as string,
+    description: (dbGame.description as string) || '',
+    status: dbGame.status as 'draft' | 'active' | 'completed' | 'archived',
+    settings: {
+      gridRows: 5,
+      gridCols: 5,
+      maxTeams: 4,
+      gameMode: 'jeopardy' as const,
+      ...(dbGame.settings as Record<string, unknown>)
+    },
+    createdBy: dbGame.created_by as string,
+    createdAt: dbGame.created_at as string,
+    updatedAt: dbGame.updated_at as string
+  }
+}
+
 // API для работы с играми
 export class GamesApi {
   // Получить список игр организации
@@ -17,7 +38,7 @@ export class GamesApi {
     const {
       status,
       search,
-      sortBy = 'createdAt',
+      sortBy = 'created_at',
       sortOrder = 'desc',
       page = 1,
       limit = 20
@@ -53,7 +74,7 @@ export class GamesApi {
     }
 
     return {
-      games: data || [],
+      games: (data || []).map(mapGameFromDb),
       total: count || 0,
       page,
       limit,
@@ -73,7 +94,7 @@ export class GamesApi {
       throw new Error(`Failed to fetch game: ${error.message}`)
     }
 
-    return data
+    return mapGameFromDb(data)
   }
 
   // Создать новую игру
@@ -99,7 +120,7 @@ export class GamesApi {
       throw new Error(`Failed to create game: ${error.message}`)
     }
 
-    return data
+    return mapGameFromDb(data)
   }
 
   // Обновить игру
@@ -121,14 +142,58 @@ export class GamesApi {
       throw new Error(`Failed to update game: ${error.message}`)
     }
 
-    return data
+    return mapGameFromDb(data)
   }
 
-  // Удалить игру (мягкое удаление)
+  // Удалить игру (жесткое удаление)
   static async deleteGame(gameId: string): Promise<void> {
+    // Сначала удаляем связанные данные (каскадное удаление)
+    // Сначала получаем ID категорий для этой игры
+    const { data: categoryIds, error: categoryIdsError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('game_id', gameId)
+
+    if (categoryIdsError) {
+      throw new Error(`Failed to get category IDs: ${categoryIdsError.message}`)
+    }
+
+    // Удаляем вопросы, если есть категории
+    if (categoryIds && categoryIds.length > 0) {
+      const { error: questionsError } = await supabase
+        .from('questions')
+        .delete()
+        .in('category_id', categoryIds.map(c => c.id))
+
+      if (questionsError) {
+        throw new Error(`Failed to delete questions: ${questionsError.message}`)
+      }
+    }
+
+    // Удаляем категории
+    const { error: categoriesError } = await supabase
+      .from('categories')
+      .delete()
+      .eq('game_id', gameId)
+
+    if (categoriesError) {
+      throw new Error(`Failed to delete categories: ${categoriesError.message}`)
+    }
+
+    // Удаляем команды
+    const { error: teamsError } = await supabase
+      .from('teams')
+      .delete()
+      .eq('game_id', gameId)
+
+    if (teamsError) {
+      throw new Error(`Failed to delete teams: ${teamsError.message}`)
+    }
+
+    // Наконец, удаляем саму игру
     const { error } = await supabase
       .from('games')
-      .update({ status: 'archived' })
+      .delete()
       .eq('id', gameId)
 
     if (error) {
@@ -162,7 +227,7 @@ export class GamesApi {
       throw new Error(`Failed to duplicate game: ${error.message}`)
     }
 
-    return data
+    return mapGameFromDb(data)
   }
 
   // Проверить лимиты плана

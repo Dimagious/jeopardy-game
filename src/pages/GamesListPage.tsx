@@ -11,7 +11,7 @@ import { GameCard, GameForm } from '../components'
 function GamesListPage() {
   const navigate = useNavigate()
   const { currentOrg, hasPermission } = useAuth()
-  const { games, isLoading, error, loadGames, createGame } = useGames(currentOrg?.id || null)
+  const { games, isLoading, error, loadGames, createGame, deleteGame, duplicateGame } = useGames(currentOrg?.id || null)
   const { limits, checkLimits } = usePlanLimits(currentOrg?.id || null)
   
   const [filters, setFilters] = useState<GameListFilters>({})
@@ -39,6 +39,29 @@ function GamesListPage() {
       await checkLimits() // Обновляем лимиты
     } catch (err) {
       console.error('Failed to create game:', err)
+    }
+  }
+
+  // Обработка дублирования игры
+  const handleDuplicateGame = async (game: Game) => {
+    try {
+      await duplicateGame(game.id, `${game.title} (Copy)`)
+      await checkLimits() // Обновляем лимиты
+    } catch (err) {
+      console.error('Failed to duplicate game:', err)
+    }
+  }
+
+  // Обработка удаления игры
+  const handleDeleteGame = async (game: Game) => {
+    if (window.confirm(`⚠️ PERMANENT DELETE ⚠️\n\nAre you sure you want to permanently delete "${game.title}"?\n\nThis will delete:\n• All categories\n• All questions\n• All teams\n• The game itself\n\nThis action CANNOT be undone!`)) {
+      try {
+        await deleteGame(game.id)
+        await checkLimits() // Обновляем лимиты
+      } catch (err) {
+        console.error('Failed to delete game:', err)
+        alert(`Failed to delete game: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      }
     }
   }
 
@@ -167,15 +190,10 @@ function GamesListPage() {
               <GameCard
                 key={game.id}
                 game={game}
+                onView={() => navigate(`/org/${currentOrg?.id}/admin/games/${game.id}/view`)}
                 onEdit={() => navigate(`/org/${currentOrg?.id}/admin/games/${game.id}/edit`)}
-                onDuplicate={() => {
-                  // TODO: Implement duplicate functionality
-                  console.log('Duplicate game:', game.id)
-                }}
-                onDelete={() => {
-                  // TODO: Implement delete functionality
-                  console.log('Delete game:', game.id)
-                }}
+                onDuplicate={() => handleDuplicateGame(game)}
+                onDelete={() => handleDeleteGame(game)}
               />
             ))}
           </div>

@@ -6,11 +6,12 @@ import Button from '../ui/Button'
 interface GameCardProps {
   game: Game
   onEdit: () => void
+  onView: () => void
   onDuplicate: () => void
   onDelete: () => void
 }
 
-export function GameCard({ game, onEdit, onDuplicate, onDelete }: GameCardProps) {
+export function GameCard({ game, onEdit, onView, onDuplicate, onDelete }: GameCardProps) {
   const getStatusColor = (status: Game['status']) => {
     switch (status) {
       case 'draft':
@@ -94,6 +95,12 @@ export function GameCard({ game, onEdit, onDuplicate, onDelete }: GameCardProps)
 
       <div className="flex items-center space-x-2">
         <Button
+          onClick={onView}
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm"
+        >
+          View
+        </Button>
+        <Button
           onClick={onEdit}
           className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm"
         >
@@ -108,9 +115,10 @@ export function GameCard({ game, onEdit, onDuplicate, onDelete }: GameCardProps)
         {game.status === 'draft' && (
           <Button
             onClick={onDelete}
-            className="bg-red-600 hover:bg-red-700 text-white text-sm px-3"
+            className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 font-semibold border-2 border-red-500 hover:border-red-600"
+            title="⚠️ PERMANENT DELETE - This will delete all categories, questions, and teams!"
           >
-            Delete
+            🗑️ Delete
           </Button>
         )}
       </div>

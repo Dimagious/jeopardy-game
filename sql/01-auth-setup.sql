@@ -53,128 +53,44 @@ CREATE POLICY "Users can view their memberships" ON memberships
   FOR SELECT USING (user_id = auth.uid());
 
 CREATE POLICY "Users can view memberships in their orgs" ON memberships
-  FOR SELECT USING (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid()
-    )
-  );
+  FOR SELECT USING (user_id = auth.uid());
 
 CREATE POLICY "Owners and Admins can manage memberships" ON memberships
-  FOR ALL USING (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin')
-    )
-  );
+  FOR ALL USING (user_id = auth.uid());
 
 -- RLS политики для игр
 CREATE POLICY "Users can view games in their orgs" ON games
-  FOR SELECT USING (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid()
-    )
-  );
+  FOR SELECT USING (true);
 
 CREATE POLICY "Hosts and above can create games" ON games
-  FOR INSERT WITH CHECK (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin', 'Host')
-    ) AND created_by = auth.uid()
-  );
+  FOR INSERT WITH CHECK (created_by = auth.uid());
 
 CREATE POLICY "Hosts and above can update games" ON games
-  FOR UPDATE USING (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin', 'Host')
-    )
-  );
+  FOR UPDATE USING (created_by = auth.uid());
 
 CREATE POLICY "Admins and above can delete games" ON games
-  FOR DELETE USING (
-    org_id IN (
-      SELECT org_id FROM memberships 
-      WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin')
-    )
-  );
+  FOR DELETE USING (created_by = auth.uid());
 
 -- RLS политики для команд
 CREATE POLICY "Users can view teams in their org games" ON teams
-  FOR SELECT USING (
-    game_id IN (
-      SELECT id FROM games 
-      WHERE org_id IN (
-        SELECT org_id FROM memberships 
-        WHERE user_id = auth.uid()
-      )
-    )
-  );
+  FOR SELECT USING (true);
 
 CREATE POLICY "Hosts and above can manage teams" ON teams
-  FOR ALL USING (
-    game_id IN (
-      SELECT id FROM games 
-      WHERE org_id IN (
-        SELECT org_id FROM memberships 
-        WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin', 'Host')
-      )
-    )
-  );
+  FOR ALL USING (true);
 
 -- RLS политики для категорий
 CREATE POLICY "Users can view categories in their org games" ON categories
-  FOR SELECT USING (
-    game_id IN (
-      SELECT id FROM games 
-      WHERE org_id IN (
-        SELECT org_id FROM memberships 
-        WHERE user_id = auth.uid()
-      )
-    )
-  );
+  FOR SELECT USING (true);
 
 CREATE POLICY "Hosts and above can manage categories" ON categories
-  FOR ALL USING (
-    game_id IN (
-      SELECT id FROM games 
-      WHERE org_id IN (
-        SELECT org_id FROM memberships 
-        WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin', 'Host')
-      )
-    )
-  );
+  FOR ALL USING (true);
 
 -- RLS политики для вопросов
 CREATE POLICY "Users can view questions in their org games" ON questions
-  FOR SELECT USING (
-    category_id IN (
-      SELECT id FROM categories 
-      WHERE game_id IN (
-        SELECT id FROM games 
-        WHERE org_id IN (
-          SELECT org_id FROM memberships 
-          WHERE user_id = auth.uid()
-        )
-      )
-    )
-  );
+  FOR SELECT USING (true);
 
 CREATE POLICY "Hosts and above can manage questions" ON questions
-  FOR ALL USING (
-    category_id IN (
-      SELECT id FROM categories 
-      WHERE game_id IN (
-        SELECT id FROM games 
-        WHERE org_id IN (
-          SELECT org_id FROM memberships 
-          WHERE user_id = auth.uid() AND role IN ('Owner', 'Admin', 'Host')
-        )
-      )
-    )
-  );
+  FOR ALL USING (true);
 
 -- RLS политики для событий очков
 CREATE POLICY "Users can view score events in their org games" ON score_events
