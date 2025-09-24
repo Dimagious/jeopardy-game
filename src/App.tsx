@@ -16,6 +16,7 @@ const GamesListPage = lazy(() => import('./pages/GamesListPage'))
 const GameEditor = lazy(() => import('./pages/GameEditor'))
 const GameViewPage = lazy(() => import('./pages/GameViewPage'))
 const TeamsPage = lazy(() => import('./pages/TeamsPage'))
+const PackLibraryPage = lazy(() => import('./pages/PackLibraryPage'))
 
 // Loading component for lazy routes
 const PageLoader = () => (
@@ -76,6 +77,14 @@ function App() {
                   element={
                     <Suspense fallback={<PageLoader />}>
                       <TeamsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/org/:orgId/admin/library"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <PackLibraryPage />
                     </Suspense>
                   }
                 />

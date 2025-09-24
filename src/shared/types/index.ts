@@ -165,6 +165,77 @@ export interface TeamLimits {
   canCreate: boolean
 }
 
+// Question Pack types
+export interface QuestionPack {
+  id: string
+  orgId: string
+  title: string
+  description?: string
+  isPublic: boolean
+  tags: string[]
+  createdBy: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PackCategory {
+  id: string
+  packId: string
+  name: string
+  color: string
+  order: number
+}
+
+export interface PackQuestion {
+  id: string
+  packCategoryId: string
+  value: number
+  text: string
+  answer: string
+  order: number
+}
+
+export interface CreatePackRequest {
+  title: string
+  description?: string
+  isPublic?: boolean
+  tags?: string[]
+}
+
+export interface UpdatePackRequest {
+  title?: string
+  description?: string
+  isPublic?: boolean
+  tags?: string[]
+}
+
+export interface PackPreview {
+  pack: QuestionPack
+  categories: PackCategory[]
+  questions: PackQuestion[]
+  stats: {
+    categoriesCount: number
+    questionsCount: number
+    totalValue: number
+    averageValue: number
+  }
+}
+
+export interface PackImportRequest {
+  packId: string
+  gameId: string
+}
+
+export interface PackFilters {
+  search?: string
+  tags?: string[]
+  isPublic?: boolean
+  sortBy?: 'title' | 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
 // Локальное состояние игры
 export interface GameState {
   gameId: string
