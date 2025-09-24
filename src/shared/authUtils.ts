@@ -8,6 +8,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   Owner: {
     canManageUsers: true,
     canManageGames: true,
+    canViewGames: true,
     canManagePacks: true,
     canManageBilling: true,
     canViewAnalytics: true,
@@ -17,6 +18,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   Admin: {
     canManageUsers: true,
     canManageGames: true,
+    canViewGames: true,
     canManagePacks: true,
     canManageBilling: false,
     canViewAnalytics: true,
@@ -26,6 +28,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   Host: {
     canManageUsers: false,
     canManageGames: true,
+    canViewGames: true,
     canManagePacks: false,
     canManageBilling: false,
     canViewAnalytics: false,
@@ -35,6 +38,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   Viewer: {
     canManageUsers: false,
     canManageGames: false,
+    canViewGames: true,
     canManagePacks: false,
     canManageBilling: false,
     canViewAnalytics: false,

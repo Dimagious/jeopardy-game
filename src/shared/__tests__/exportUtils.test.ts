@@ -44,6 +44,8 @@ describe('exportUtils', () => {
         order: 1,
         isLocked: false,
         isDone: true,
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z",
       },
       {
         id: 'q-1-2',
@@ -54,6 +56,8 @@ describe('exportUtils', () => {
         order: 2,
         isLocked: false,
         isDone: true,
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z",
       },
     ],
     gameTitle: 'Демо-игра Jeopardy',

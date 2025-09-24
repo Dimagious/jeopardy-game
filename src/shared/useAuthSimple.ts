@@ -18,7 +18,7 @@ export function useAuth() {
     try {
       // Пока что создаём демо-данные для тестирования
       const demoOrg: Organization = {
-        id: 'demo-org-1',
+        id: '550e8400-e29b-41d4-a716-446655440000',
         name: 'Demo Organization',
         description: 'Тестовая организация',
         createdBy: supabaseUser.id,

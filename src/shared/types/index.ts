@@ -54,6 +54,84 @@ export interface GameListResponse {
   hasMore: boolean
 }
 
+// Category types
+export interface Category {
+  id: string
+  gameId: string
+  name: string
+  color?: string
+  order: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateCategoryRequest {
+  name: string
+  color?: string
+  order?: number
+}
+
+export interface UpdateCategoryRequest {
+  name?: string
+  color?: string
+  order?: number
+}
+
+export interface ReorderCategoriesRequest {
+  categoryIds: string[]
+}
+
+// Question types
+export interface Question {
+  id: string
+  categoryId: string
+  value: number
+  text: string
+  answer: string
+  order: number
+  isLocked: boolean
+  isDone: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateQuestionRequest {
+  value: number
+  text: string
+  answer: string
+  order?: number
+}
+
+export interface UpdateQuestionRequest {
+  value?: number
+  text?: string
+  answer?: string
+  order?: number
+}
+
+export interface MoveQuestionRequest {
+  targetCategoryId: string
+  order?: number
+}
+
+// Content validation
+export interface ContentValidation {
+  isValid: boolean
+  errors: {
+    categories?: string[]
+    questions?: string[]
+  }
+}
+
+// Game content summary
+export interface GameContentSummary {
+  categoriesCount: number
+  questionsCount: number
+  totalValue: number
+  averageValue: number
+  isComplete: boolean
+}
+
 // Локальное состояние игры
 export interface GameState {
   gameId: string
@@ -167,6 +245,7 @@ export interface AuthState {
 export interface RolePermissions {
   canManageUsers: boolean
   canManageGames: boolean
+  canViewGames: boolean
   canManagePacks: boolean
   canManageBilling: boolean
   canViewAnalytics: boolean
