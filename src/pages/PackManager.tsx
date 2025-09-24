@@ -7,10 +7,6 @@ export default function PackManager() {
   const [activeTab, setActiveTab] = useState<'import' | 'library'>('import')
   const [selectedPack, setSelectedPack] = useState<QuestionPack | null>(null)
 
-  const handlePackImported = (pack: QuestionPack) => {
-    setSelectedPack(pack)
-    setActiveTab('library')
-  }
 
   const handlePackSelected = (pack: QuestionPack) => {
     setSelectedPack(pack)
