@@ -8,8 +8,8 @@ interface TeamCardProps {
   onEdit: () => void
   onDelete: () => void
   onDuplicate: () => void
-  onMoveUp?: () => void
-  onMoveDown?: () => void
+  onMoveUp?: (() => void) | (() => Promise<void>)
+  onMoveDown?: (() => void) | (() => Promise<void>)
   isFirst?: boolean
   isLast?: boolean
 }

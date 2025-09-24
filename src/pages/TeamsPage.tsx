@@ -38,12 +38,12 @@ function TeamsPage() {
     }
   }, [hasPermission, navigate, authLoading])
 
-  const handleCreateTeam = async (data: CreateTeamRequest) => {
+  const handleCreateTeam = async (data: CreateTeamRequest | UpdateTeamRequest) => {
     if (!gameId) return
 
     setIsSubmitting(true)
     try {
-      await createTeam(data)
+      await createTeam(data as CreateTeamRequest)
       setShowTeamForm(false)
     } catch (err) {
       console.error('Failed to create team:', err)
@@ -53,12 +53,12 @@ function TeamsPage() {
     }
   }
 
-  const handleUpdateTeam = async (data: UpdateTeamRequest) => {
+  const handleUpdateTeam = async (data: CreateTeamRequest | UpdateTeamRequest) => {
     if (!editingTeam) return
 
     setIsSubmitting(true)
     try {
-      await updateTeam(editingTeam.id, data)
+      await updateTeam(editingTeam.id, data as UpdateTeamRequest)
       setEditingTeam(null)
     } catch (err) {
       console.error('Failed to update team:', err)
@@ -88,7 +88,7 @@ function TeamsPage() {
     }
   }
 
-  const handleMoveTeam = async (team: Team, direction: 'up' | 'down') => {
+  const handleMoveTeam = (team: Team, direction: 'up' | 'down') => {
     const currentIndex = teams.findIndex(t => t.id === team.id)
     if (currentIndex === -1) return
 
@@ -97,15 +97,14 @@ function TeamsPage() {
 
     const newOrder = [...teams]
     const [movedTeam] = newOrder.splice(currentIndex, 1)
+    if (!movedTeam) return
     newOrder.splice(newIndex, 0, movedTeam)
 
     const teamIds = newOrder.map(t => t.id)
-    try {
-      await reorderTeams({ teamIds })
-    } catch (err) {
+    reorderTeams({ teamIds }).catch(err => {
       console.error('Failed to reorder teams:', err)
       alert(`Failed to reorder teams: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    }
+    })
   }
 
   const handleEditTeam = (team: Team) => {
@@ -195,19 +194,26 @@ function TeamsPage() {
               </div>
             </Card>
           ) : (
-            teams.map((team, index) => (
-              <TeamCard
-                key={team.id}
-                team={team}
-                onEdit={() => handleEditTeam(team)}
-                onDelete={() => handleDeleteTeam(team)}
-                onDuplicate={() => handleDuplicateTeam(team)}
-                onMoveUp={index > 0 ? () => handleMoveTeam(team, 'up') : undefined}
-                onMoveDown={index < teams.length - 1 ? () => handleMoveTeam(team, 'down') : undefined}
-                isFirst={index === 0}
-                isLast={index === teams.length - 1}
-              />
-            ))
+            teams.map((team, index) => {
+              const teamCardProps = {
+                key: team.id,
+                team,
+                onEdit: () => handleEditTeam(team),
+                onDelete: () => handleDeleteTeam(team),
+                onDuplicate: () => handleDuplicateTeam(team),
+                isFirst: index === 0,
+                isLast: index === teams.length - 1,
+              }
+
+              if (index > 0) {
+                (teamCardProps as any).onMoveUp = () => handleMoveTeam(team, 'up')
+              }
+              if (index < teams.length - 1) {
+                (teamCardProps as any).onMoveDown = () => handleMoveTeam(team, 'down')
+              }
+
+              return <TeamCard {...teamCardProps} />
+            })
           )}
         </div>
 

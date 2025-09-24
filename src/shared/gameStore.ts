@@ -63,9 +63,9 @@ const DEMO_QUESTIONS: Question[] = [
 ]
 
 const DEMO_TEAMS: Team[] = [
-  { id: 'team-1', gameId: 'demo-game', name: 'Команда 1', order: 1 },
-  { id: 'team-2', gameId: 'demo-game', name: 'Команда 2', order: 2 },
-  { id: 'team-3', gameId: 'demo-game', name: 'Команда 3', order: 3 },
+  { id: 'team-1', gameId: 'demo-game', name: 'Команда 1', color: '#EF4444', order: 1, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'team-2', gameId: 'demo-game', name: 'Команда 2', color: '#3B82F6', order: 2, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+  { id: 'team-3', gameId: 'demo-game', name: 'Команда 3', color: '#10B981', order: 3, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
 ]
 
 const DEMO_GAME: Game = {
