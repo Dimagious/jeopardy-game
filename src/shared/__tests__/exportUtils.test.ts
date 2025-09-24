@@ -31,8 +31,8 @@ describe('exportUtils', () => {
       },
     ],
     teams: [
-      { id: 'team-1', gameId: 'demo-game', name: 'Команда 1', order: 1 },
-      { id: 'team-2', gameId: 'demo-game', name: 'Команда 2', order: 2 },
+      { id: 'team-1', gameId: 'demo-game', name: 'Команда 1', color: '#EF4444', order: 1, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+      { id: 'team-2', gameId: 'demo-game', name: 'Команда 2', color: '#3B82F6', order: 2, createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
     ],
     questions: [
       {
