@@ -72,9 +72,17 @@ const DEMO_GAME: Game = {
   id: 'demo-game',
   orgId: 'demo-org',
   title: 'Демо-игра Jeopardy',
+  description: 'Демонстрационная игра для тестирования',
   status: 'active',
+  settings: {
+    gridRows: 5,
+    gridCols: 5,
+    maxTeams: 4,
+    gameMode: 'jeopardy'
+  },
   createdBy: 'demo-user',
   createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
 }
 
 // Типы режимов игры

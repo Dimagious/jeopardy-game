@@ -12,6 +12,7 @@ const PlayerPage = lazy(() => import('./pages/PlayerPage'))
 const PinRedirectPage = lazy(() => import('./pages/PinRedirectPage'))
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const GamesListPage = lazy(() => import('./pages/GamesListPage'))
 
 // Loading component for lazy routes
 const PageLoader = () => (
@@ -40,6 +41,14 @@ function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <AdminPage />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/org/:orgId/admin/games" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <GamesListPage />
               </Suspense>
             } 
           />
