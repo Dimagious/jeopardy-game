@@ -1,8 +1,10 @@
 import { useAuth } from '../shared/useAuthSimple'
 import { OrgSelector } from '../components'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui'
+import { useNavigate } from 'react-router-dom'
 
 export default function AdminPage() {
+  const navigate = useNavigate()
   const { 
     user, 
     isLoading, 
@@ -143,10 +145,14 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {hasPermission('canManageGames') && (
-                  <Button variant="primary" className="h-20 flex flex-col items-center justify-center">
+                {hasPermission('canManageGames') && currentOrg && (
+                  <Button 
+                    variant="primary" 
+                    className="h-20 flex flex-col items-center justify-center"
+                    onClick={() => navigate(`/org/${currentOrg.id}/admin/games`)}
+                  >
                     <div className="text-2xl mb-1">🎮</div>
-                    <div className="text-sm">Создать игру</div>
+                    <div className="text-sm">Управление играми</div>
                   </Button>
                 )}
                 

@@ -3,9 +3,55 @@ export interface Game {
   id: string
   orgId: string
   title: string
-  status: 'draft' | 'active' | 'finished'
+  description?: string
+  status: 'draft' | 'active' | 'completed' | 'archived'
+  settings: {
+    gridRows: number
+    gridCols: number
+    maxTeams: number
+    gameMode: 'jeopardy' | 'buzzer'
+    [key: string]: unknown
+  }
   createdBy: string
   createdAt: string
+  updatedAt: string
+}
+
+// Game creation/update types
+export interface CreateGameRequest {
+  title: string
+  description?: string
+  settings: {
+    gridRows: number
+    gridCols: number
+    maxTeams: number
+    gameMode: 'jeopardy' | 'buzzer'
+  }
+}
+
+export interface UpdateGameRequest {
+  title?: string
+  description?: string
+  status?: 'draft' | 'active' | 'completed' | 'archived'
+  settings?: Partial<Game['settings']>
+}
+
+// Game list and filtering
+export interface GameListFilters {
+  status?: Game['status'][] | undefined
+  search?: string | undefined
+  sortBy?: 'title' | 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+export interface GameListResponse {
+  games: Game[]
+  total: number
+  page: number
+  limit: number
+  hasMore: boolean
 }
 
 // Локальное состояние игры
